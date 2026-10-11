@@ -1,4 +1,7 @@
 import{test}from'node:test';import assert from'node:assert/strict';import{example,stages,addDays,encode,decode,validate}from'../dist/model.js';
+import{deliverableItems}from'../dist/model.js';
+test('structured deliverable specifications survive client sharing',()=>{const p=example();assert.deepEqual(decode(encode(p)).deliverableItems,p.deliverableItems);assert.match(p.deliverableItems[0].specs,/Rec.709/);assert.equal(validate({...p,deliverableItems:[{name:'',specs:'Rec.709'}]}),false)});
+test('legacy deliverables retain their wording without invented specifications',()=>{const p=example();delete p.deliverableItems;p.deliverables='Custom master\nSocial cut';assert.equal(validate(p),true);assert.deepEqual(deliverableItems(p),[{name:'Custom master',specs:''},{name:'Social cut',specs:''}])});
 test('weekends are excluded across month boundaries',()=>{assert.equal(addDays('2026-10-30',2),'2026-11-03')});
 test('client snapshots round-trip unicode and never include internal costing',()=>{const p=example();p.title='A film — 漢字';const out=decode(encode(p));assert.equal(out.title,p.title);for(const k of['rate','days','costs'])assert.equal(k in out,false)});
 test('extra reviews add review and refinement time in chronological order',()=>{const p=example();p.reviews=4;const s=stages(p);assert.equal(s.filter(v=>v.name.startsWith('Review')).length,4);for(let i=1;i<s.length;i++)assert.equal(s[i].start,s[i-1].end);assert.ok(s.at(-1).end>p.start)});
