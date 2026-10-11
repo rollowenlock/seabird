@@ -1,0 +1,5 @@
+import{test}from'node:test';import assert from'node:assert/strict';import{example,stages,addDays,encode,decode,validate}from'../dist/model.js';
+test('weekends are excluded across month boundaries',()=>{assert.equal(addDays('2026-10-30',2),'2026-11-03')});
+test('client snapshots round-trip unicode and never include internal costing',()=>{const p=example();p.title='A film — 漢字';const out=decode(encode(p));assert.equal(out.title,p.title);for(const k of['rate','days','costs'])assert.equal(k in out,false)});
+test('extra reviews add review and refinement time in chronological order',()=>{const p=example();p.reviews=4;const s=stages(p);assert.equal(s.filter(v=>v.name.startsWith('Review')).length,4);for(let i=1;i<s.length;i++)assert.equal(s[i].start,s[i-1].end);assert.ok(s.at(-1).end>p.start)});
+test('invalid snapshots and unbounded dates and costs are rejected',()=>{assert.equal(validate({...example(),reviews:1000}),false);assert.equal(validate({...example(),fee:-1}),false);assert.throws(()=>decode('bad'))});
