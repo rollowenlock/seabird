@@ -50,4 +50,10 @@ For remote client sharing, deploy `dist/` to an HTTPS static host accessible wit
 
 Review the commercial wording and pricing defaults. Browser interaction and mobile layout verification are still pending. Decide whether to add durable server storage, stable revocable client URLs and recorded acceptance. Working-day calculations currently skip weekends but not public holidays.
 
-GitHub is the source of truth. Hosting is not yet configured.
+## Hosting
+
+Live app: https://seabird-umber.vercel.app
+
+GitHub repository: https://github.com/rollowenlock/seabird
+
+The Vercel project `seabird` is connected to this repository. Pushes to `main` deploy to production; other branches receive preview deployments. `vercel.json` serves `dist/` and runs `npm test` before deployment. Production is accessible without a login. Drafts still remain in the browser that created them.
