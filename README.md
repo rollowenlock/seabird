@@ -1,6 +1,6 @@
-# ROLL Project Notes
+# Seabird
 
-A small app for pricing title-sequence projects and presenting the scope, commercial terms and schedule on one simple client page.
+Seabird helps freelancers price projects and present the scope, commercial terms and schedule on one simple client page. In the mockup, Roll is the studio using Seabird and Northlight Films is their client.
 
 ## Run locally
 
