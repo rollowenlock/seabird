@@ -1,4 +1,5 @@
 .openai/
+.vercel/
 .env
 .env.*
 !.env.example
@@ -7,3 +8,5 @@ node_modules/
 *.tar.gz
 .DS_Store
 coverage/
+
+.vercel
