@@ -1,5 +1,6 @@
 import{test}from'node:test';import assert from'node:assert/strict';import{example,stages,addDays,encode,decode,validate}from'../dist/model.js';
 import{deliverableItems}from'../dist/model.js';
+test('changes policy persists in snapshots and rejects non-text values',()=>{const p=example();p.changesPolicy='Custom change process';assert.equal(decode(encode(p)).changesPolicy,p.changesPolicy);assert.equal(validate({...p,changesPolicy:{}}),false)});
 test('structured deliverable specifications survive client sharing',()=>{const p=example();assert.deepEqual(decode(encode(p)).deliverableItems,p.deliverableItems);assert.match(p.deliverableItems[0].specs,/Rec.709/);assert.equal(validate({...p,deliverableItems:[{name:'',specs:'Rec.709'}]}),false)});
 test('legacy deliverables retain their wording without invented specifications',()=>{const p=example();delete p.deliverableItems;p.deliverables='Custom master\nSocial cut';assert.equal(validate(p),true);assert.deepEqual(deliverableItems(p),[{name:'Custom master',specs:''},{name:'Social cut',specs:''}])});
 test('weekends are excluded across month boundaries',()=>{assert.equal(addDays('2026-10-30',2),'2026-11-03')});

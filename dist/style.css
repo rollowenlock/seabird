@@ -22,3 +22,7 @@ button:disabled{cursor:wait;opacity:.5}
 @media(max-width:1000px){header{gap:20px}.brandnote{display:none}.rows{grid-template-columns:repeat(2,minmax(0,1fr))}.project-card,.project-card:nth-child(n+4){grid-column:span 1}.project-card:last-child{grid-column:1/-1}}
 @media(max-width:600px){header{height:auto;min-height:80px;flex-wrap:wrap;padding:20px 22px;gap:16px}#actions{flex-wrap:wrap;gap:6px;margin-left:0;width:100%}.rows{grid-template-columns:1fr}.project-card,.project-card:nth-child(n+4){grid-column:1/-1}.project-card summary{min-height:0;padding:20px}.card-top{margin-bottom:14px}.card-description{min-height:0}.project-card[open]{display:block}.project-card[open] summary{border-right:0;border-bottom:1px solid var(--line)}.project-card .detail{padding:20px}.agreement-intro h1{font-size:34px}}
 @media print{.rows{display:block}.project-card,.project-card[open]{display:block;border:0;border-radius:0}.project-card summary{min-height:0;padding:15px 0}.card-top,.card-description,.card-bottom{display:none}.project-card .detail{padding:0}.project-card[open] summary{border:0}}
+
+/* Six equal overview cards. */
+@media(min-width:1001px){.project-card:nth-child(n+4){grid-column:span 2}.project-card[open]{grid-column:1/-1}}
+@media(min-width:601px) and (max-width:1000px){.project-card:last-child{grid-column:span 1}.project-card[open]{grid-column:1/-1}}

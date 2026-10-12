@@ -23,7 +23,7 @@ npm test
 - Deposit/balance split linked to kick-off and delivery.
 - One clickable timeline; review durations shift subsequent stages, skipping weekends.
 - Client preview and shareable, read-only project snapshots without internal rates or costs.
-- Five expandable overview cards, with one open at a time.
+- Six expandable overview cards, with one open at a time.
 - Agreement view previews and downloads an actual PDF, including all scope, specifications, stage responsibilities, dates, payments, terms and blank signature/name/date lines for both parties.
 - Browser-local drafts and JSON backup/import.
 
