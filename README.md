@@ -23,7 +23,9 @@ npm test
 - Deposit/balance split linked to kick-off and delivery.
 - One clickable timeline; review durations shift subsequent stages, skipping weekends.
 - Client preview and shareable, read-only project snapshots without internal rates or costs.
-- Browser-local drafts, JSON backup/import, and client print/PDF view.
+- Five expandable overview cards, with one open at a time.
+- Agreement view previews and downloads an actual PDF, including all scope, specifications, stage responsibilities, dates, payments, terms and blank signature/name/date lines for both parties.
+- Browser-local drafts and JSON backup/import.
 
 The initial project is fictional example content. Commercial wording is editable starter content, not a complete approved contract.
 
@@ -48,7 +50,9 @@ For remote client sharing, deploy `dist/` to an HTTPS static host accessible wit
 
 ## Before everyday client use
 
-Review the commercial wording and pricing defaults. Browser interaction and mobile layout verification are still pending. Decide whether to add durable server storage, stable revocable client URLs and recorded acceptance. Working-day calculations currently skip weekends but not public holidays.
+Review the commercial wording and pricing defaults. The cards and PDF download have been checked in desktop and mobile browser layouts, and the sample PDF has been rendered and inspected. PDF signatures are blank spaces for signing externally; the app does not capture signatures or send emails. Decide whether to add durable server storage, stable revocable client URLs and recorded acceptance. Working-day calculations currently skip weekends but not public holidays.
+
+PDF generation runs locally in the browser using the vendored pdfmake 0.2.20 distribution and its bundled Roboto fonts in `dist/vendor/`. The library is loaded only when opening Agreement; project data is not sent to a PDF service.
 
 ## Hosting
 
