@@ -57,10 +57,38 @@ export function agreementDefinition(p, issued = new Date()) {
   };
 }
 
+const escapeHtml = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Render the same document definition as native HTML. PDF tooling is not needed here.
+export function agreementHtml(p, issued = new Date()) {
+  const doc=agreementDefinition(p,issued);
+  function render(value){
+    if(typeof value==='string'||typeof value==='number')return `<span>${escapeHtml(value)}</span>`;
+    if(Array.isArray(value))return value.map(render).join('');
+    const node=value,style={...(doc.styles[node.style]||{}),...node};
+    const css=[];
+    if(style.fontSize)css.push(`font-size:${style.fontSize*4/3}px`);
+    if(style.bold)css.push('font-weight:700');
+    if(style.color)css.push(`color:${style.color}`);
+    if(style.alignment)css.push(`text-align:${style.alignment}`);
+    if(style.margin){const [l,t,r,b]=style.margin;css.push(`margin:${t*4/3}px ${r*4/3}px ${b*4/3}px ${l*4/3}px`)}
+    const attr=`style="${escapeHtml(css.join(';'))}"`;
+    if(node.columns)return `<div class="paper-columns" ${attr}>${node.columns.map(col=>`<div style="${typeof col.width==='number'?`flex:0 1 ${col.width*4/3}px`:'flex:1;min-width:0'}">${render(col)}</div>`).join('')}</div>`;
+    if(node.stack)return `<div ${attr}>${node.stack.map(render).join('')}</div>`;
+    if(node.canvas)return `<svg class="paper-timeline" viewBox="0 0 499 10" aria-label="Project timeline">${node.canvas.map(shape=>`<rect x="${shape.x}" y="${shape.y}" width="${shape.w}" height="${shape.h}" rx="${shape.r}" fill="${shape.color}"/>`).join('')}</svg>`;
+    if(node.table)return `<div class="paper-table-wrap"><table class="paper-table"><thead><tr>${node.table.body[0].map(cell=>`<th>${render(cell)}</th>`).join('')}</tr></thead><tbody>${node.table.body.slice(1).map(row=>`<tr>${row.map(cell=>`<td>${render(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const text=Array.isArray(node.text)?node.text.map(render).join(''):escapeHtml(node.text);
+    const tag=node.style==='title'?'h1':node.style==='section'?'h2':'div';
+    return `<${tag} class="paper-text" ${attr}>${text}</${tag}>`;
+  }
+  const sheets=[[]];for(const node of doc.content){if(node.pageBreak==='before')sheets.push([]);sheets.at(-1).push(node)}
+  return sheets.map((sheet,i)=>`<article class="agreement-paper" aria-label="${i?'Signature sheet':'Project agreement'}">${sheet.map(render).join('')}<div class="paper-footer"><span>Roll / ${escapeHtml(p.client)}</span><span>Seabird</span></div></article>`).join('');
+}
+
 let library;
 function loadScript(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>{s.remove();reject(new Error('Could not load PDF tools. Please try again.'))};document.head.append(s)})}
-export async function agreementBlob(p){
+export async function agreementBlob(p, issued = new Date()){
   if(!library)library=(async()=>{await loadScript('./vendor/pdfmake.min.js');await loadScript('./vendor/vfs_fonts.js')})().catch(err=>{library=null;throw err});
   await library;
-  return new Promise((resolve,reject)=>{try{window.pdfMake.createPdf(agreementDefinition(p)).getBlob(resolve)}catch(err){reject(err)}});
+  return new Promise((resolve,reject)=>{try{window.pdfMake.createPdf(agreementDefinition(p,issued)).getBlob(resolve)}catch(err){reject(err)}});
 }

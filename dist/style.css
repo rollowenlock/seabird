@@ -26,3 +26,10 @@ button:disabled{cursor:wait;opacity:.5}
 /* Six equal overview cards. */
 @media(min-width:1001px){.project-card:nth-child(n+4){grid-column:span 2}.project-card[open]{grid-column:1/-1}}
 @media(min-width:601px) and (max-width:1000px){.project-card:last-child{grid-column:span 1}.project-card[open]{grid-column:1/-1}}
+@font-face{font-family:AgreementRoboto;src:url('./vendor/Roboto-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:AgreementRoboto;src:url('./vendor/Roboto-Medium.ttf') format('truetype');font-weight:700;font-display:swap}
+.agreement-view{max-width:900px;margin:auto}.agreement-intro{margin:0 auto 32px;max-width:794px}
+.agreement-paper{font-family:AgreementRoboto,Arial,sans-serif;background:white;color:#30372e;width:100%;max-width:794px;margin:0 auto 28px;padding:64px;border:1px solid #e1e1da;box-shadow:0 5px 24px #24282008;font-size:13.333px;line-height:1.3;overflow-wrap:anywhere}
+.agreement-paper h1,.agreement-paper h2{letter-spacing:0;line-height:1.3;font-family:inherit}.paper-text{white-space:pre-wrap}.paper-columns{display:flex;gap:0}.paper-table-wrap{overflow-x:auto}.paper-table{width:100%;border-collapse:collapse;text-align:left;font-size:inherit}.paper-table th{border-bottom:2px solid #30372e}.paper-table td{border-bottom:1px solid #ccc}.paper-table th,.paper-table td{padding:6px 5px;vertical-align:top}.paper-table th:first-child,.paper-table td:first-child{padding-left:0}.paper-timeline{display:block;width:100%;height:auto;margin-bottom:7px}.paper-footer{display:flex;justify-content:space-between;gap:16px;font-size:10px;color:#72786e;margin-top:45px;padding-top:16px;border-top:1px solid #e6e6e0}
+@media(max-width:600px){.agreement-paper{padding:25px 20px}.agreement-paper .paper-columns{flex-wrap:wrap;row-gap:16px}.agreement-paper .paper-columns>div{min-width:100px!important}.agreement-paper .paper-table{font-size:11px}.agreement-paper h1{font-size:29px!important}.agreement-intro{margin-bottom:25px}}
+@media print{.agreement-intro{display:none}.agreement-paper{max-width:none;border:0;box-shadow:none;padding:0;break-before:page}.agreement-paper:first-child{break-before:auto}}

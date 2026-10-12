@@ -1,4 +1,4 @@
-import {agreementBlob} from './agreement.js';
+import {agreementBlob,agreementHtml} from './agreement.js';
 import{example,stages,clientProject,encode,decode,validate,deliverableItems,defaultChangesPolicy}from './model.js';
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key='roll-projects-v1';let projects=[],p,preview=false,readonly=location.hash.startsWith('#project='),storageOK=true;const dialog=$('#dialog');
@@ -41,14 +41,20 @@ function editDeliverables(){
   $('#deliverable-editors').onclick=e=>{if(e.target.closest('.remove-deliverable'))e.target.closest('.deliverable-editor').remove()};
 }
 
-let agreementUrl=null,agreementFilename='',agreementRequest=0;
-async function showAgreement(){
- const request=++agreementRequest;
- $('#actions').innerHTML='<button data-action="back-project">← Back to project</button><button class="primary" data-action="download-agreement" disabled>Download PDF ↓</button>';
- $('#app').innerHTML='<section class="agreement-view"><div class="agreement-intro"><span class="section-label">THE COMPLETE PICTURE</span><h1>Your project, on paper.</h1><p>All six sections, the full timeline, and signature spaces for Roll and '+esc(p.client)+'. Ready to download, email and sign.</p></div><p id="pdf-status" role="status">Preparing your agreement…</p><iframe id="agreement-preview" title="Project agreement PDF preview" hidden></iframe></section>';
- try{const blob=await agreementBlob(p);if(request!==agreementRequest)return;if(agreementUrl)URL.revokeObjectURL(agreementUrl);agreementUrl=URL.createObjectURL(blob);agreementFilename=(p.title.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'project')+'-agreement.pdf';$('#agreement-preview').src=agreementUrl;$('#agreement-preview').hidden=false;$('#pdf-status').textContent='Preview the exact PDF below. If your browser cannot display it, use Download PDF.';$('[data-action="download-agreement"]').disabled=false}
- catch(err){if(request!==agreementRequest)return;$('#pdf-status').textContent='The PDF could not be generated. Go back to the project and try again.';toast('Could not generate agreement. Please try again.')}
+
+let agreementRequest=0,agreementSnapshot=null,agreementIssued=null;
+function showAgreement(){
+ agreementRequest++;agreementSnapshot=structuredClone(p);agreementIssued=new Date();
+ $('#actions').innerHTML='<button data-action="back-project">← Back to project</button><button class="primary" data-action="download-agreement">Download PDF ↓</button>';
+ $('#app').innerHTML='<section class="agreement-view"><div class="agreement-intro"><span class="section-label">THE COMPLETE PICTURE</span><h1>Your project, on paper.</h1><p>Review the full agreement below. Download a PDF when you are ready to email it for signing.</p><p class="hint">The PDF uses the same content and styling, with page breaks for printing.</p></div>'+agreementHtml(agreementSnapshot,agreementIssued)+'</section>';
+ window.scrollTo(0,0);
 }
-function closeAgreement(){agreementRequest++;if(agreementUrl){URL.revokeObjectURL(agreementUrl);agreementUrl=null}render()}
-function downloadAgreement(){if(!agreementUrl)return;const a=document.createElement('a');a.href=agreementUrl;a.download=agreementFilename;document.body.append(a);a.click();a.remove()}
+function closeAgreement(){agreementRequest++;agreementSnapshot=null;render();window.scrollTo(0,0)}
+async function downloadAgreement(){
+ if(!agreementSnapshot)return;const request=agreementRequest,button=$('[data-action="download-agreement"]');if(button.disabled)return;
+ button.disabled=true;button.textContent='Making PDF…';
+ try{const snapshot=agreementSnapshot;const blob=await agreementBlob(snapshot,agreementIssued);if(request!==agreementRequest)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(snapshot.title.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'project')+'-agreement.pdf';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+ catch{if(request===agreementRequest)toast('Could not generate the PDF. Please try again.')}
+ finally{if(request===agreementRequest){button.disabled=false;button.textContent='Download PDF ↓'}}
+}
 document.addEventListener('toggle',e=>{if(e.target.matches('.project-card')&&e.target.open)document.querySelectorAll('.project-card').forEach(card=>{if(card!==e.target)card.open=false})},true);

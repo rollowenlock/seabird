@@ -1,6 +1,12 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {agreementDefinition} from '../dist/agreement.js';
+import {agreementDefinition,agreementHtml} from '../dist/agreement.js';
+test('web agreement renders all sections safely without an embedded PDF',()=>{
+ const p=example();p.title='<script>alert(1)</script>';
+ const html=agreementHtml(p);
+ assert.ok(html.includes('&lt;script&gt;'));assert.ok(!html.includes('<script>'));assert.ok(!html.includes('<iframe'));
+ for(const label of ['Deliverables','Reviews &amp; timing','Client materials','Payments','Working agreement','Changes &amp; delays','Signature:'])assert.ok(html.includes(label),label);
+});
 import {example,stages} from '../dist/model.js';
 
 test('agreement carries the complete client scope and excludes private estimates',()=>{
