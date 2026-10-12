@@ -77,7 +77,7 @@ export function agreementHtml(p, issued = new Date()) {
     if(node.stack)return `<div ${attr}>${node.stack.map(render).join('')}</div>`;
     if(node.canvas)return `<svg class="paper-timeline" viewBox="0 0 499 10" aria-label="Project timeline">${node.canvas.map(shape=>`<rect x="${shape.x}" y="${shape.y}" width="${shape.w}" height="${shape.h}" rx="${shape.r}" fill="${shape.color}"/>`).join('')}</svg>`;
     if(node.table)return `<div class="paper-table-wrap"><table class="paper-table"><thead><tr>${node.table.body[0].map(cell=>`<th>${render(cell)}</th>`).join('')}</tr></thead><tbody>${node.table.body.slice(1).map(row=>`<tr>${row.map(cell=>`<td>${render(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-    const text=Array.isArray(node.text)?node.text.map(render).join(''):escapeHtml(node.text);
+    const text=Array.isArray(node.text)?node.text.map(part=>typeof part==='object'?`<span${part.bold?' style="font-weight:700"':''}>${escapeHtml(part.text)}</span>`:escapeHtml(part)).join(''):escapeHtml(node.text);
     const tag=node.style==='title'?'h1':node.style==='section'?'h2':'div';
     return `<${tag} class="paper-text" ${attr}>${text}</${tag}>`;
   }
