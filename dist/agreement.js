@@ -46,7 +46,7 @@ export function agreementDefinition(p, issued = new Date()) {
       section('05 / Working agreement'),paragraph(p.terms),
       {text:'Usage & handover',bold:true,margin:[0,6,0,5]},paragraph(p.rights),
       section('06 / Changes & delays'),paragraph(p.changesPolicy??'No separate changes policy was specified in this version. Please refer to the working agreement.'),
-      {unbreakable:true,stack:[section('Agreement & signatures'),paragraph('By signing below, both parties confirm the scope, specifications, schedule, responsibilities, fee and terms set out in this document.'),
+      {pageBreak:'before',stack:[section('Agreement & signatures'),paragraph('By signing below, both parties confirm the scope, specifications, schedule, responsibilities, fee and terms set out in this document.'),
         {columns:['Roll',p.client].map(party=>({stack:[{text:party,bold:true,margin:[0,8,0,16]},
           {text:'Signature: __________________________',margin:[0,0,0,16]},
           {text:'Name: ______________________________',margin:[0,0,0,16]},
