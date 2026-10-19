@@ -1,7 +1,8 @@
+import {mountCloud} from './cloud.js';
 import {agreementBlob,agreementHtml} from './agreement.js';
 import{example,stages,clientProject,encode,decode,validate,deliverableItems,defaultChangesPolicy}from './model.js';
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const key='roll-projects-v1';let projects=[],p,preview=false,readonly=location.hash.startsWith('#project='),storageOK=true;const dialog=$('#dialog');
+const key='seabird-workspace-v2';let projects=[],p,preview=false,readonly=location.hash.startsWith('#project='),storageOK=true;const dialog=$('#dialog');
 try{projects=JSON.parse(localStorage.getItem(key)||'[]').filter(validate)}catch{storageOK=false}if(readonly){try{p=decode(location.hash.slice(9))}catch{$('#app').innerHTML='<div class="error"><h1>This link is incomplete.</h1><p>Ask Roll for a fresh project link.</p></div>';throw Error('Invalid shared project')}}else{if(!projects.length)projects=[example()];p=projects[0]}
 function money(n){return new Intl.NumberFormat('en-NZ',{style:'currency',currency:p.currency,maximumFractionDigits:0}).format(n)}function date(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'})}function save(){if(readonly)return;try{localStorage.setItem(key,JSON.stringify(projects));storageOK=true}catch{storageOK=false;toast('Storage is full or unavailable. Export a backup to keep this project.')}render()}function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),4000)}
 function render(){if(!readonly&&p.changesPolicy===undefined)p.changesPolicy=defaultChangesPolicy;const client=readonly||preview,s=stages(p),end=s.at(-1).end;document.title=`${p.title} — Seabird`;$('#actions').innerHTML=readonly?'':preview?'<button data-action="preview">← Back to editing</button><button class="primary" data-action="share">Share project ↗</button>':'<button data-action="projects">Projects</button><button data-action="preview">Client view</button><button class="primary" data-action="share">Share project ↗</button>';
@@ -58,3 +59,5 @@ async function downloadAgreement(){
  finally{if(request===agreementRequest){button.disabled=false;button.textContent='Download PDF ↓'}}
 }
 document.addEventListener('toggle',e=>{if(e.target.matches('.project-card')&&e.target.open)document.querySelectorAll('.project-card').forEach(card=>{if(card!==e.target)card.open=false})},true);
+
+if(!readonly)mountCloud({getProjects:()=>projects,validate,setProjects:items=>{projects=items;p=projects[0];save();}});
