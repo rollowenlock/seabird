@@ -50,7 +50,11 @@ export function createCloud(settings=config, request=fetch, storage=null) {
       if(result.length!==1)throw new Error('Cloud workspace changed. Load the cloud version before saving.');
       return result[0];
     },
-    async proposal(id){return (await data('proposals?project_id=eq.'+encodeURIComponent(id)+'&select=*,proposal_versions(*),acceptances(*)'))[0]||null;},
+    async proposal(id){
+      const row=(await data('proposals?project_id=eq.'+encodeURIComponent(id)+'&select=*,proposal_versions(*)'))[0];
+      if(!row)return null;
+      row.acceptances=await data('acceptances?proposal_id=eq.'+encodeURIComponent(row.id)+'&order=version.desc');return row;
+    },
     publish(id,project,version){return data('rpc/publish_proposal','POST',{project_id:id,project,expected_version:version});},
     manage(id,action){return data('rpc/manage_proposal','POST',{project_id:id,action});},
     read(token){return data('rpc/read_proposal','POST',{link_token:token},true);},
