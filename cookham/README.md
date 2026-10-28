@@ -5,13 +5,26 @@ private proposal arrays, a server-controlled revision and timestamp. No dependen
 on another app's business data, no privileged runtime key, storage buckets or jobs.
 Only a user's own membership/workspace is accessible. App deletion cascades its
 workspace but retains shared Auth. Sign-in uses the existing Cookham credentials;
-email delivery/new-account registration remains deferred. Sessions stay in memory
-and expire on reload. Passwords are never stored.
+email delivery/new-account registration remains deferred. Sessions persist in
+sessionStorage across reloads of the same tab, with refresh-token rotation.
+Passwords are never stored. Account drafts use distinct local-storage keys.
 
 Cloud Save/Load is explicit. Updates compare the loaded revision and stop on a
 conflict. Load is required before editing an existing cloud workspace on a new
 device. Browser drafts use a new storage key; legacy proposals are not imported.
-Client-share links remain static snapshots; cloud proposal rows are never public.
+New client links use random tokens and narrow read/accept RPCs. The proposals,
+proposal_versions and acceptances tables are owner-readable only. Owner publish
+and revoke RPCs check identity and membership. Public RPCs require the exact token,
+never return private estimates or submitted email, and expose no listing endpoint.
+Published versions are immutable; acceptance locks and checks the current version.
+Revoke blocks reads/acceptance; replace rotates the token. Old acceptance records
+are retained across publishing/revocation, until explicit app-data deletion.
+Legacy URL-fragment snapshots still render without acceptance.
+
+The owner RPCs use SECURITY DEFINER for controlled writes and immutable records;
+the public RPCs use it for capability-token access without public table grants.
+All functions have empty search paths and explicit execute grants. No function is
+created in public, and anonymous callers cannot publish or manage links.
 
 Production-only build settings: SEABIRD_SUPABASE_URL and
 SEABIRD_SUPABASE_PUBLISHABLE_KEY. The build emits only public connection settings;

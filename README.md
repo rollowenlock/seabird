@@ -1,63 +1,65 @@
 # Seabird
 
-Seabird helps freelancers price projects and present the scope, commercial terms and schedule on one simple client page. In the mockup, Roll is the studio using Seabird and Northlight Films is their client.
+Seabird brings Roll’s pricing, scope, schedule, client proposal and agreement together.
+Live: https://seabird-umber.vercel.app · Repository: https://github.com/rollowenlock/seabird
 
-## Run locally
+## Run and check
 
-Requires Node.js 22 or newer. There are no npm dependencies to install.
+Node.js 22 or newer. `npm ci`, then `npm run dev` (Windows: `npm.cmd`).
+Open http://127.0.0.1:4318. Run `npm test` for model, agreement, session and real
+PostgreSQL policy/version tests (PGlite). Runtime code has no npm dependencies.
 
-```sh
-npm run dev
-```
+## Everyday workflow
 
-Open http://127.0.0.1:4318. On Windows PowerShell, use `npm.cmd run dev` if script execution policy blocks `npm`.
+1. Open Workspace and sign in using an existing Cookham email/password.
+2. On a new device, use Load cloud version. Export a backup before replacing device edits.
+3. Create/edit the project, price, deliverables, timeline and commercial terms.
+4. Save to cloud. The workspace summary distinguishes device changes from saved data.
+5. Share project → Publish client version → Copy link. Publishing also saves the draft.
+6. The client reviews the page or agreement, then enters their name/email and accepts
+   the exact published version. No login is needed and no payment is taken.
+7. Open Share project to see acceptance history or download the records with the exact
+   published content. Publish changes deliberately; old acceptance never approves a new version.
 
-```sh
-npm test
-```
+Sign-in survives reloads in the same browser tab. Refresh tokens are kept in session
+storage, never passwords; closing the tab ends the saved session. Account drafts have
+separate device-storage keys. Signed-out drafts remain separate and can be moved with
+JSON export/import. Email onboarding and password recovery are deferred with Cookham SMTP.
 
-## Current version
+Cloud saves use revision checks. A stale save is rejected rather than overwriting another
+device. Saving does not publish. Cloud loading requires explicit confirmation; it does not
+merge. Device drafts are not encrypted; export before clearing browser storage.
 
-- Editable projects, deliverables, client materials and commercial terms.
-- Day-rate estimate with a separately adjustable client fee and currency.
-- Deposit/balance split linked to kick-off and delivery.
-- One clickable timeline; review durations shift subsequent stages, skipping weekends.
-- Client preview and shareable, read-only project snapshots without internal rates or costs.
-- Six expandable overview cards, with one open at a time.
-- Agreement view shows a styled webpage and generates a downloadable PDF only on request, including all scope, specifications, stage responsibilities, dates, payments, terms and blank signature/name/date lines for both parties.
-- Browser-local drafts and JSON backup/import.
+## Client sharing and acceptance
 
-The initial project is fictional example content. Commercial wording is editable starter content, not a complete approved contract.
+New `#proposal=` links contain a random capability token, not project content. The server
+returns only the latest explicitly published client-safe version. Anyone with the link can
+view and accept; the entered identity/email is self-declared, not independently verified.
+Internal day rates, estimates and costs are excluded in both client code and the database.
+There is no public table listing. Revocation stops further reads and acceptance. Replacing
+a revoked link generates a new token. It cannot erase copies already downloaded.
 
-## Data and sharing
+Published versions are immutable. Acceptance stores version, name, email, server timestamp
+and the exact agreement statement. Retries cannot replace the first acceptance. An outdated
+open page must reload and review before accepting. History is visible only to the workspace
+owner; the public page shows acceptance time, without the submitted email.
 
-Drafts are stored in this browser's local storage, not on a server or in GitHub. Export backups before moving browsers or clearing storage. There is no account system or device sync.
+Legacy `#project=` snapshots still open, but cannot be updated/revoked or record acceptance.
+The PDF is generated on demand in the browser and can be signed externally. There is no
+email sending, payment collection, verified electronic signature, or holiday calendar.
+Editable starter contract wording should be reviewed for each real project.
 
-Shared project data is encoded in the URL fragment, not encrypted or digitally signed. Anyone with the complete link can read it and could create an altered copy. Each link is a snapshot: subsequent edits require a new link, and existing links cannot be revoked. This version does not record acceptance, signatures or payments.
+Deleting Seabird cloud data removes its proposals, versions and acceptances as well as the
+workspace. It does not remove the shared Cookham identity or other apps. Device copies remain.
 
-For remote client sharing, deploy `dist/` to an HTTPS static host accessible without login. A localhost link works only on the machine running the app. Repository creation does not publish the app. The source repository can remain private while the deployed app is public; the public app does not contain your browser's drafts.
+## Implementation and release
 
-## Structure
+`dist/` is maintained source. `app.js` edits drafts, `model.js` handles schedules/validation,
+`cloud.js` handles sessions and cloud saves, `sharing.js` handles publication and acceptance,
+and `agreement.js` renders the webpage/PDF. Vendored pdfmake 0.2.20/fonts generate PDFs locally.
 
-- `dist/index.html` — page shell
-- `dist/style.css` — responsive interface
-- `dist/app.js` — editing, local persistence and client view
-- `dist/model.js` — schedule calculations, validation and snapshot encoding
-- `server.js` — local preview server
-- `test/model.test.js` — model checks
-
-`dist/` is maintained source, not generated build output. Google Fonts is the only external presentation request, with a system-font fallback.
-
-## Before everyday client use
-
-Review the commercial wording and pricing defaults. The cards and PDF download have been checked in desktop and mobile browser layouts, and the sample PDF has been rendered and inspected. PDF signatures are blank spaces for signing externally; the app does not capture signatures or send emails. Decide whether to add durable server storage, stable revocable client URLs and recorded acceptance. Working-day calculations currently skip weekends but not public holidays.
-
-PDF generation runs locally in the browser using the vendored pdfmake 0.2.20 distribution and its bundled Roboto fonts in `dist/vendor/`. The library is loaded only when clicking Download PDF; project data is not sent to a PDF service.
-
-## Hosting
-
-Live app: https://seabird-umber.vercel.app
-
-GitHub repository: https://github.com/rollowenlock/seabird
-
-The Vercel project `seabird` is connected to this repository. Pushes to `main` deploy to production; other branches receive preview deployments. `vercel.json` serves `dist/` and runs `npm test` before deployment. Production is accessible without a login. Drafts still remain in the browser that created them.
+The isolated `seabird` schema lives in Cookham. See `cookham/README.md` for backend details.
+Apply migrations through Cookham’s pinned per-app ledger before releasing the frontend.
+Production-only public environment variables generate `dist/backend-config.js`; previews and
+local development default to cloud-disabled. Vercel installs with `npm ci`, runs tests and
+builds the public configuration. Stage a production build, verify it, then promote it.

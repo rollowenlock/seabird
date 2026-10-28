@@ -1,8 +1,26 @@
 {
-  "version": 1, "slug": "seabird", "schema": "seabird", "backend": "supabase",
+  "version": 1,
+  "slug": "seabird",
+  "schema": "seabird",
+  "backend": "supabase",
   "migrationDirectory": "cookham/supabase/migrations",
-  "tables": ["profiles", "workspaces"],
-  "identity": {"table": "profiles", "column": "user_id"},
-  "buckets": [], "functions": [], "schedules": [], "queues": [],
-  "environment": ["SEABIRD_SUPABASE_URL", "SEABIRD_SUPABASE_PUBLISHABLE_KEY"]
+  "tables": [
+    "profiles",
+    "workspaces",
+    "proposals",
+    "proposal_versions",
+    "acceptances"
+  ],
+  "identity": {
+    "table": "profiles",
+    "column": "user_id"
+  },
+  "buckets": [],
+  "functions": [],
+  "schedules": [],
+  "queues": [],
+  "environment": [
+    "SEABIRD_SUPABASE_URL",
+    "SEABIRD_SUPABASE_PUBLISHABLE_KEY"
+  ]
 }

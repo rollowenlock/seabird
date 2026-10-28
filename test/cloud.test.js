@@ -1,7 +1,31 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createCloud} from '../dist/cloud.js';
+import {createCloud,fingerprint} from '../dist/cloud.js';
+test('cloud dirty state ignores JSON key ordering but preserves ordered deliverables',()=>{
+  assert.equal(fingerprint({a:1,b:[{z:2,x:3}]}),fingerprint({b:[{x:3,z:2}],a:1}));
+  assert.notEqual(fingerprint([1,2]),fingerprint([2,1]));
+});
 const settings={url:'https://example.supabase.co',key:'sb_publishable_test',schema:'seabird'};
+test('sessions survive reload, normalise expires_in and never store passwords',async()=>{
+  const values=new Map(),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
+  const user={id:'a',email:'a@example.test'};
+  const request=async url=>Response.json(url.endsWith('/user')?user:{user,access_token:'access',refresh_token:'refresh',expires_in:3600});
+  const first=createCloud(settings,request,storage);await first.signIn(user.email,'secret-password');
+  assert.ok(![...values.values()].join('').includes('secret-password'));
+  const next=createCloud(settings,request,storage);assert.equal((await next.restore()).id,'a');
+  await next.signOut();assert.equal(values.size,0);assert.equal(next.user,null);
+});
+test('parallel requests share a single refresh and public links never send a user token',async()=>{
+  let refreshes=0;const calls=[];
+  const cloud=createCloud(settings,async(url,options)=>{
+    calls.push({url,options});
+    if(url.includes('grant_type=password'))return Response.json({user:{id:'a'},access_token:'old',refresh_token:'r',expires_at:1});
+    if(url.includes('refresh_token')){refreshes++;await new Promise(r=>setTimeout(r,10));return Response.json({user:{id:'a'},access_token:'new',refresh_token:'r2',expires_in:3600});}
+    return Response.json([]);
+  });
+  await cloud.signIn('a','b');await Promise.all([cloud.load(),cloud.load()]);assert.equal(refreshes,1);
+  await cloud.read('token');assert.equal(calls.at(-1).options.headers.Authorization,undefined);
+});
 test('cloud writes are schema scoped and reject a stale revision',async()=>{
   const calls=[];
   const cloud=createCloud(settings,async(url,options)=>{
