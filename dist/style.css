@@ -42,13 +42,14 @@ button:disabled{cursor:wait;opacity:.5}
 .cloud-panel label{flex:1;min-width:180px}.cloud-panel input{width:100%}
 .cloud-panel p{font-size:13px;max-width:760px}.cloud-status{margin-bottom:0;color:var(--muted)}
 .cloud-panel [hidden]{display:none!important}.share-buttons a{align-self:center;font-size:12px;color:inherit}
+.cloud-panel form{display:block;max-width:620px}.google-signin{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;background:white;border-color:#c9cbc3;font-weight:600}.google-signin:hover{background:#f2f3ec}.google-signin span{display:grid;place-items:center;width:20px;height:20px;border:1px solid #d5d7cf;border-radius:50%;font-family:Arial,sans-serif;color:#3459a8;font-size:12px}.cloud-divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.8px}.cloud-divider::before,.cloud-divider::after{content:'';height:1px;flex:1;background:var(--line)}.email-signin{display:flex;flex-wrap:wrap;align-items:end;gap:12px}
 .share-status{padding:16px;background:#eef1e7;border-radius:8px}.share-status p{margin-bottom:0}
 .acceptance-history{margin:22px 0}.acceptance-history summary{cursor:pointer}.acceptance-history p{font-size:13px}
 #sharing-error{color:#894031;font-size:13px}.acceptance-panel{margin:36px 0;padding:30px;background:#eef1e7;border:1px solid #d7dfcb;border-radius:12px}
 .acceptance-panel h2{font-size:26px;letter-spacing:-.5px}.acceptance-panel p{font-size:14px;max-width:700px}
 .acceptance-panel .pair label{flex:1}.acceptance-check{display:flex;align-items:start;gap:12px;font-size:13px;line-height:1.6;margin:20px 0}
 .acceptance-check input{width:18px;height:18px;flex-shrink:0;margin-top:3px}.acceptance-panel [role=status]{color:#6e3a22}
-@media(max-width:600px){.cloud-panel{margin:12px 22px;padding:16px}.cloud-panel form{display:block}.cloud-panel input{margin-bottom:12px}.acceptance-panel{padding:22px}.acceptance-panel .pair{display:block}}
+@media(max-width:600px){.cloud-panel{margin:12px 22px;padding:16px}.cloud-panel input{margin-bottom:12px}.email-signin{display:block}.email-signin button{width:100%}.acceptance-panel{padding:22px}.acceptance-panel .pair{display:block}}
 .projects-home .intro{align-items:center;margin-top:0}.projects-home h1{margin-top:16px}.project-count{white-space:nowrap;font-size:13px;color:var(--muted)}
 .project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .project-tile{display:flex;flex-direction:column;text-align:left;padding:26px;border-radius:12px;background:#fffef9;min-height:260px;overflow-wrap:anywhere}

@@ -6,8 +6,8 @@ and timestamps. The legacy workspace array remains during rollout and mirrors wr
 forward into project rows. No dependency on another app's business data, no privileged
 runtime key, storage buckets or jobs.
 Only a user's own membership/workspace is accessible. App deletion cascades its
-workspace but retains shared Auth. Sign-in uses the existing Cookham credentials;
-email delivery/new-account registration remains deferred. Sessions persist in
+workspace but retains shared Auth. Google OAuth creates or reuses a Cookham identity;
+existing Cookham email/password sign-in remains available. Sessions persist in
 sessionStorage across reloads of the same tab, with refresh-token rotation.
 Passwords are never stored. Account drafts use distinct local-storage keys.
 

@@ -10,7 +10,7 @@ export function createCloud(settings=config, request=fetch, storage=null) {
   }
   async function auth(path, body, token, method='POST') {
     const r=await request(settings.url+'/auth/v1/'+path,{method,headers:{apikey:settings.key,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
-    if(!r.ok)throw new Error('Sign-in expired or failed. Please sign in with your Cookham email and password.');
+    if(!r.ok)throw new Error('Your sign-in expired or failed. Please try again.');
     const value=r.status===204?null:await r.json();
     if(value?.access_token && !value.expires_at)value.expires_at=Math.floor(Date.now()/1000)+(value.expires_in||3600);
     return value;
@@ -43,6 +43,29 @@ export function createCloud(settings=config, request=fetch, storage=null) {
       try{session=JSON.parse(storage.getItem(sessionKey)||'null');if(!session)return null;await fresh();const user=await auth('user',null,session.access_token,'GET');persist({...session,user});return user;}catch{persist(null);return null;}
     },
     async signIn(email,password){persist(await auth('token?grant_type=password',{email,password}));return session.user.email;},
+    googleAuthorizeUrl(redirectTo){
+      if(!settings)throw new Error('Google sign-in is available on the live Seabird app.');
+      const url=new URL(settings.url+'/auth/v1/authorize');
+      url.searchParams.set('provider','google');
+      url.searchParams.set('redirect_to',redirectTo);
+      return url.toString();
+    },
+    async consumeOAuthFragment(fragment){
+      const params=new URLSearchParams(String(fragment||'').replace(/^#/,''));
+      const oauthError=params.get('error_description')||params.get('error');
+      if(oauthError)throw new Error('Google sign-in failed. '+oauthError);
+      const accessToken=params.get('access_token');
+      if(!accessToken)return false;
+      const user=await auth('user',null,accessToken,'GET');
+      persist({
+        access_token:accessToken,
+        refresh_token:params.get('refresh_token')||'',
+        expires_at:Number(params.get('expires_at'))||Math.floor(Date.now()/1000)+(Number(params.get('expires_in'))||3600),
+        token_type:params.get('token_type')||'bearer',
+        user
+      });
+      return true;
+    },
     async join(){const existing=await data('profiles?select=user_id');if(!existing.length)await data('profiles','POST',{user_id:session.user.id});},
     listProjects(){return data('projects?select=id,project,revision,created_at,updated_at&order=updated_at.desc');},
     async saveProject(project,revision){
@@ -74,7 +97,7 @@ export function mountCloud({getProjects,setProjects,setAccount,validate,onState=
   let storage;try{storage=sessionStorage;}catch{storage=null;}
   const cloud=createCloud(config,fetch,storage);
   const panel=document.createElement('details');panel.className='cloud-panel';
-  panel.innerHTML='<summary>Workspace <span class="cloud-summary">· saved on this device</span></summary><p>Sign in to keep projects across devices and publish client links. Your edits stay private until you publish them.</p><form><label>Email <input name="email" type="email" autocomplete="username" required></label><label>Password <input name="password" type="password" autocomplete="current-password" required></label><button>Sign in</button></form><div class="cloud-controls" hidden><button data-cloud="save" class="primary">Save projects to cloud</button><button data-cloud="load">Load cloud projects</button><button data-cloud="out">Sign out</button><button data-cloud="delete">Delete Seabird cloud data</button></div><p role="status" class="cloud-status"></p>';
+  panel.innerHTML='<summary>Workspace <span class="cloud-summary">· saved on this device</span></summary><p>Sign in to keep projects across devices and publish client links. Your edits stay private until you publish them.</p><form><button type="button" class="google-signin" data-cloud="google"><span aria-hidden="true">G</span>Continue with Google</button><div class="cloud-divider"><span>or use email</span></div><div class="email-signin"><label>Email <input name="email" type="email" autocomplete="username" required></label><label>Password <input name="password" type="password" autocomplete="current-password" required></label><button>Sign in</button></div></form><div class="cloud-controls" hidden><button data-cloud="save" class="primary">Save projects to cloud</button><button data-cloud="load">Load cloud projects</button><button data-cloud="out">Sign out</button><button data-cloud="delete">Delete Seabird cloud data</button></div><p role="status" class="cloud-status"></p>';
   document.querySelector('header').after(panel);
   const form=panel.querySelector('form'),controls=panel.querySelector('.cloud-controls'),status=panel.querySelector('.cloud-status'),summary=panel.querySelector('.cloud-summary');
   let rows=new Map(),baseline=new Map(),busy=false,needsLoad=false;
@@ -109,6 +132,7 @@ export function mountCloud({getProjects,setProjects,setAccount,validate,onState=
     stamp([...rows.values()]);changed();return [...rows.values()];
   }};
   if(!cloud.enabled){form.hidden=true;status.textContent='Local preview: cloud saving and publishing are available on the live app.';return controller;}
+  form.addEventListener('click',e=>{if(e.target.closest('[data-cloud="google"]')){status.textContent='Opening Google…';location.assign(cloud.googleAuthorizeUrl(location.origin+location.pathname));}});
   form.addEventListener('submit',e=>{e.preventDefault();run(async()=>{await cloud.signIn(form.elements.email.value,form.elements.password.value);form.elements.password.value='';await connect();});});
   controls.addEventListener('click',e=>{const action=e.target.dataset.cloud;if(!action)return;run(async()=>{
     if(action==='save'){await controller.save();status.textContent='Projects saved to cloud. Published client versions are unchanged.';}
@@ -123,6 +147,13 @@ export function mountCloud({getProjects,setProjects,setAccount,validate,onState=
       await cloud.remove();try{await cloud.signOut();}finally{setAccount(null);form.hidden=false;controls.hidden=true;rows=new Map();baseline=new Map();needsLoad=false;status.textContent='Seabird cloud workspace deleted.';}
     }
   });});
-  controller.ready=run(async()=>{const user=await cloud.restore();if(user)await connect();else status.textContent='Use your existing Cookham account. Sign-in lasts for this browser tab, including reloads.';});
+  controller.ready=run(async()=>{
+    const oauthFragment=/^#(?:access_token|error|error_description)=/.test(location.hash);
+    let oauth=false;
+    try{if(oauthFragment)oauth=await cloud.consumeOAuthFragment(location.hash);}
+    finally{if(oauthFragment)history.replaceState(null,'',location.pathname+location.search);}
+    const user=oauth?cloud.user:await cloud.restore();
+    if(user)await connect();else status.textContent='Continue with Google to create your workspace, or use an existing Cookham account. Sign-in lasts for this browser tab.';
+  });
   return controller;
 }

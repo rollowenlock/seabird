@@ -11,7 +11,7 @@ PostgreSQL policy/version tests (PGlite). Runtime code has no npm dependencies.
 
 ## Everyday workflow
 
-1. Open Workspace and sign in using an existing Cookham email/password.
+1. Open Workspace and continue with Google to create or open your Cookham account. Existing Cookham email/password sign-in remains available.
 2. On a new device, Seabird loads the account's project list when there are no device drafts. If both exist, export a backup before choosing Load cloud projects.
 3. Create or open a project, then edit its price, deliverables, timeline and commercial terms.
 4. Save to cloud. Each changed project has its own revision, so an update on one project cannot overwrite another project.
@@ -21,10 +21,15 @@ PostgreSQL policy/version tests (PGlite). Runtime code has no npm dependencies.
 7. Open Share project to see acceptance history or download the records with the exact
    published content. Publish changes deliberately; old acceptance never approves a new version.
 
-Sign-in survives reloads in the same browser tab. Refresh tokens are kept in session
+Google OAuth returns directly to the Seabird page and creates the app profile on first sign-in. Sign-in survives reloads in the same browser tab. Refresh tokens are kept in session
 storage, never passwords; closing the tab ends the saved session. Account drafts have
 separate device-storage keys. Signed-out drafts remain separate and can be moved with
-JSON export/import. Email onboarding and password recovery are deferred with Cookham SMTP.
+JSON export/import. Email onboarding and password recovery remain secondary to Google sign-in.
+
+Google Auth uses Cookham's Supabase provider configuration. Its Google web client must allow
+`https://seabird-cookham-preview.vercel.app` as a JavaScript origin and
+`https://khkzewmiymzgicnjaimr.supabase.co/auth/v1/callback` as the provider callback. Add the
+Seabird URL to Supabase Auth's redirect allow list before releasing the button.
 
 Cloud saves use per-project revision checks. A stale save is rejected rather than overwriting
 another device. Saving does not publish. Cloud loading requires explicit confirmation when

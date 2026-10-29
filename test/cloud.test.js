@@ -15,6 +15,23 @@ test('sessions survive reload, normalise expires_in and never store passwords',a
   const next=createCloud(settings,request,storage);assert.equal((await next.restore()).id,'a');
   await next.signOut();assert.equal(values.size,0);assert.equal(next.user,null);
 });
+test('Google OAuth returns safely to Seabird and persists only the Supabase session',async()=>{
+  const values=new Map(),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
+  const calls=[],cloud=createCloud(settings,async(url,options)=>{calls.push({url,options});return Response.json({id:'google-user',email:'person@example.test'});},storage);
+  const redirect='https://seabird-cookham-preview.vercel.app/';
+  const authorize=new URL(cloud.googleAuthorizeUrl(redirect));
+  assert.equal(authorize.origin,'https://example.supabase.co');
+  assert.equal(authorize.pathname,'/auth/v1/authorize');
+  assert.equal(authorize.searchParams.get('provider'),'google');
+  assert.equal(authorize.searchParams.get('redirect_to'),redirect);
+  assert.equal(await cloud.consumeOAuthFragment('#access_token=access&refresh_token=refresh&expires_in=3600&provider_token=do-not-store'),true);
+  assert.equal(cloud.user.email,'person@example.test');
+  assert.match(calls[0].url,/\/auth\/v1\/user$/);
+  assert.equal(calls[0].options.headers.Authorization,'Bearer access');
+  const saved=[...values.values()].join('');
+  assert.match(saved,/refresh/);assert.ok(!saved.includes('do-not-store'));
+  assert.equal(await cloud.consumeOAuthFragment('#project=client-share'),false);
+});
 test('parallel requests share a single refresh and public links never send a user token',async()=>{
   let refreshes=0;const calls=[];
   const cloud=createCloud(settings,async(url,options)=>{
