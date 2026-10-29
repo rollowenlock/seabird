@@ -75,7 +75,7 @@ This creates three clear modes without adding a generic task board:
 
 | Product area | Status | What exists now | What remains |
 | --- | --- | --- | --- |
-| Account creation and sign-in | **Partial** | Cookham email/password sign-in and session restoration. Google OAuth UI and callback handling are built and tested. | Enable Google in Cookham, release commit `09b2578`, then test a brand-new account on phone and desktop. Password recovery is not implemented. |
+| Account creation and sign-in | **Partial** | Cookham email/password sign-in and session restoration. Google OAuth UI and callback handling are deployed and tested in code. | Enable Google in Cookham, then test a brand-new account on phone and desktop. Password recovery is not implemented. |
 | Projects home | **Live** | Empty state, project count, project cards, reopen project and create project. | Add project status, useful sorting and search only when real accounts have enough projects to need them. |
 | Project creation | **Live** | Name, client, description and kick-off date. New projects do not invent commercial figures or sample work. | Improve first-project guidance and provide optional duplication from an existing project. |
 | Scope and deliverables | **Live** | Named deliverables with technical specifications and client-safe rendering. | Test the language and editing flow with working studios; consider reusable deliverable templates later. |
@@ -91,8 +91,8 @@ This creates three clear modes without adding a generic task board:
 | Mobile experience | **Partial** | Responsive styles and earlier mobile checks exist. | Retest the full current create, edit, publish and accept journey on a real phone. |
 | Collaboration and permissions | **Not started** | Projects currently have one owner. Clients only receive public proposal links. | Do not build team roles until solo users prove the core workflow and describe a concrete collaboration need. |
 | Tasks, files and chat | **Not started** | Seabird has no task board, file store or project chat. | Keep these outside the defined product unless stage and time-passing research demonstrates a specific missing job. |
-| Stages as live project state | **Built, needs validation** | Stable stages have current/upcoming/completed states, confirmed completion dates, waiting state and a compact owner-only activity history. Existing projects can identify their current stage without invented historical dates. | Apply the Cookham migration, release the frontend and test stage progression on a real project. |
-| Time passing | **Built, needs validation** | Owner view shows today, working-day countdowns, due/overdue state and the next stage. Replanning shifts only remaining incomplete stages; material changes route through a formal variation and new agreement version. Accepted/public dates remain frozen until republished. | Complete hosted and mobile validation. Research whether clients should later see progress and whether public holidays matter enough to model. |
+| Stages as live project state | **Live, needs validation** | Stable stages have current/upcoming/completed states, confirmed completion dates, waiting state and a compact owner-only activity history. Existing projects can identify their current stage without invented historical dates. | Test stage progression on a real project and complete mobile visual QA. |
+| Time passing | **Live, needs validation** | Owner view shows today, working-day countdowns, due/overdue state and the next stage. Replanning shifts only remaining incomplete stages; material changes route through a formal variation and new agreement version. Accepted/public dates remain frozen until republished. | Complete hosted and mobile journey validation. Research whether clients should later see progress and whether public holidays matter enough to model. |
 | Notifications and email | **Not started** | No email is sent by Seabird. | Possible later work: send proposal, remind client and issue acceptance receipt. This requires renewed approval before setup. |
 | Billing | **Not started** | No subscriptions, invoices or payments. | Keep out of the alpha until usage demonstrates value and a charging model is chosen. |
 | Product analytics and support | **Not started** | Automated technical tests exist; there is no product event funnel or in-product feedback route. | Add privacy-conscious activation/publish/acceptance events and a simple tester feedback channel before expanding the alpha. |
@@ -105,9 +105,9 @@ The repository currently passes **29 automated tests**, including real PostgreSQ
 revision, publication, privacy, acceptance and revocation tests.
 
 The product is not yet a dependable alpha for new users because the most important entry point,
-Google sign-up, is still awaiting provider configuration and deployment. The current public test
-URL responds successfully, but a complete new-user-to-client-acceptance journey has not been
-verified against the Google-enabled release.
+Google sign-up, is still awaiting provider configuration. Its code and the time-passing release are
+deployed, and the public URL responds successfully, but a complete new-user-to-client-acceptance
+journey has not been verified against an enabled Google provider.
 
 ## Roadmap
 
@@ -156,7 +156,7 @@ Goal: make sending, reviewing and recording approval feel professionally complet
 **Exit criteria:** testers trust the acceptance record for their normal work; clients understand what
 they are accepting; republishing never creates ambiguity about which version is current.
 
-### Milestone 3 — Make the agreed plan live — built, awaiting hosted validation
+### Milestone 3 — Make the agreed plan live — released, awaiting journey validation
 
 Goal: keep Seabird useful after acceptance by showing how the real project is moving through the agreed plan.
 
@@ -169,8 +169,8 @@ Built for owner-side validation:
 - A deliberate replan flow that distinguishes the accepted baseline from the latest forecast.
 - A compact private record of why a timeline moved and who is responsible for the next action.
 
-Next: apply the stage-plan publication migration through Cookham's pinned ledger, release the
-frontend, then validate setup, completion, waiting, replanning and republishing on mobile.
+The stage-plan publication migration and matching frontend are live. Next: validate setup,
+completion, waiting, replanning and republishing on a real project and mobile browser.
 
 Research whether clients should see live progress and whether reminders belong here. Continue to
 exclude task lists, chat, file management, team roles, invoicing and payments until repeated evidence
@@ -192,7 +192,7 @@ generic task board.
 | P2 | Studio defaults and templates | Reduces repeat setup time | Repeated real projects |
 | P2 | Version change summary | Improves client confidence on revisions | Approval feedback |
 | P2 | Accepted-version receipt/PDF | Improves record keeping | Legal/content decision |
-| P0 | Release and validate time passing | Makes the accepted plan useful during the project | Cookham migration and hosted build |
+| P0 | Validate time passing on a real project | Makes the accepted plan useful during the project | Mobile/browser access |
 | Explore | Email delivery and reminders | Reduces manual sending/follow-up | Renewed approval and provider choice |
 | Explore | Team access | Supports multi-person studios | Repeated demand from active users |
 | Explore | Client-visible progress | Extends the shared plan after acceptance | Stage/time-passing validation |
