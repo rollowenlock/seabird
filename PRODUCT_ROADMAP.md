@@ -101,7 +101,7 @@ This creates three clear modes without adding a generic task board:
 
 Seabird's differentiated core is already built: a studio can combine scope, commercial terms,
 schedule, client proposal, agreement and acceptance rather than moving among separate documents.
-The repository currently passes **29 automated tests**, including real PostgreSQL policy,
+The repository currently passes **31 automated tests**, including real PostgreSQL policy,
 revision, publication, privacy, acceptance and revocation tests.
 
 The product is not yet a dependable alpha for new users because the most important entry point,
