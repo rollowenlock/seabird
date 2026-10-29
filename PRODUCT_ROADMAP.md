@@ -38,12 +38,12 @@ and analytics support them, but are not the product's organising model.
 | Area | Product question | Current position |
 | --- | --- | --- |
 | **Price** | What will the project cost, what sits behind that figure, and when is it paid? | Strong initial implementation: private costing, agreed fee, currency, tax, deposit and payment wording. |
-| **Timeline** | When does the project begin and finish, and what is the overall sequence? | Strong planned timeline generated from working-day durations. It does not yet react visibly to today's date or actual progress. |
+| **Timeline** | When does the project begin and finish, and what is the overall sequence? | Planned and working timelines use working-day durations; deliberate replanning moves remaining incomplete stages without rewriting the accepted version. |
 | **Deliverables** | What exactly is being made and to what specification? | Strong structured implementation with named outputs and technical specifications. |
 | **Terms** | What are the rules, responsibilities, rights and consequences of change? | Strong editable implementation; the starter wording still needs content/legal review. |
 | **Agreement** | What exact combination of price, timeline, deliverables and terms did the client accept? | Versioned publication, readable agreement, PDF and recorded acceptance are built; the current hosted journey still needs final validation. |
-| **Stages** | What are the meaningful phases of the work, who owns each phase and how does work move between them? | Planned stages and owners are generated, but they are not yet live project states that can be completed, delayed or moved. |
-| **Time passing** | Where are we today, what should be happening now, what is next and what has slipped? | Not yet implemented as a product system. This is the largest defined area still to design. |
+| **Stages** | What are the meaningful phases of the work, who owns each phase and how does work move between them? | Stages now have stable identities, current/upcoming/completed states, confirmation actions and an owner-only activity record. |
+| **Time passing** | Where are we today, what should be happening now, what is next and what has slipped? | Built for owner testing: today, working-day countdowns, overdue and waiting states, deliberate replanning and formal project variations. Hosted validation remains. |
 
 The relationship is:
 
@@ -91,8 +91,8 @@ This creates three clear modes without adding a generic task board:
 | Mobile experience | **Partial** | Responsive styles and earlier mobile checks exist. | Retest the full current create, edit, publish and accept journey on a real phone. |
 | Collaboration and permissions | **Not started** | Projects currently have one owner. Clients only receive public proposal links. | Do not build team roles until solo users prove the core workflow and describe a concrete collaboration need. |
 | Tasks, files and chat | **Not started** | Seabird has no task board, file store or project chat. | Keep these outside the defined product unless stage and time-passing research demonstrates a specific missing job. |
-| Stages as live project state | **Partial** | Direction, making, review and delivery stages have planned dates, durations, owners and client-visible descriptions. | Add current/upcoming/completed state, actual transition dates and deliberate delay/replan actions. |
-| Time passing | **Not started** | The timeline is calculated from project inputs. | Add a today marker, current-stage view, upcoming moments, elapsed/remaining time, overdue states and a clear distinction between the accepted baseline and the working forecast. |
+| Stages as live project state | **Built, needs validation** | Stable stages have current/upcoming/completed states, confirmed completion dates, waiting state and a compact owner-only activity history. Existing projects can identify their current stage without invented historical dates. | Apply the Cookham migration, release the frontend and test stage progression on a real project. |
+| Time passing | **Built, needs validation** | Owner view shows today, working-day countdowns, due/overdue state and the next stage. Replanning shifts only remaining incomplete stages; material changes route through a formal variation and new agreement version. Accepted/public dates remain frozen until republished. | Complete hosted and mobile validation. Research whether clients should later see progress and whether public holidays matter enough to model. |
 | Notifications and email | **Not started** | No email is sent by Seabird. | Possible later work: send proposal, remind client and issue acceptance receipt. This requires renewed approval before setup. |
 | Billing | **Not started** | No subscriptions, invoices or payments. | Keep out of the alpha until usage demonstrates value and a charging model is chosen. |
 | Product analytics and support | **Not started** | Automated technical tests exist; there is no product event funnel or in-product feedback route. | Add privacy-conscious activation/publish/acceptance events and a simple tester feedback channel before expanding the alpha. |
@@ -101,7 +101,7 @@ This creates three clear modes without adding a generic task board:
 
 Seabird's differentiated core is already built: a studio can combine scope, commercial terms,
 schedule, client proposal, agreement and acceptance rather than moving among separate documents.
-The repository currently passes **22 automated tests**, including real PostgreSQL policy,
+The repository currently passes **29 automated tests**, including real PostgreSQL policy,
 revision, publication, privacy, acceptance and revocation tests.
 
 The product is not yet a dependable alpha for new users because the most important entry point,
@@ -156,18 +156,21 @@ Goal: make sending, reviewing and recording approval feel professionally complet
 **Exit criteria:** testers trust the acceptance record for their normal work; clients understand what
 they are accepting; republishing never creates ambiguity about which version is current.
 
-### Milestone 3 — Make the agreed plan live
+### Milestone 3 — Make the agreed plan live — built, awaiting hosted validation
 
 Goal: keep Seabird useful after acceptance by showing how the real project is moving through the agreed plan.
 
-Design and validate:
+Built for owner-side validation:
 
-- A clear today marker and current stage.
+- A clear today marker, current stage and working-day countdown.
 - Upcoming stage transitions, client reviews and delivery moments.
-- Completed, active, upcoming and late stage states.
-- Actual stage transition dates without rewriting the accepted agreement.
+- Completed, active, upcoming, waiting and overdue stage states.
+- Confirmed completion dates without rewriting the accepted agreement.
 - A deliberate replan flow that distinguishes the accepted baseline from the latest forecast.
-- A simple record of why a timeline moved and who is responsible for the next action.
+- A compact private record of why a timeline moved and who is responsible for the next action.
+
+Next: apply the stage-plan publication migration through Cookham's pinned ledger, release the
+frontend, then validate setup, completion, waiting, replanning and republishing on mobile.
 
 Research whether clients should see live progress and whether reminders belong here. Continue to
 exclude task lists, chat, file management, team roles, invoicing and payments until repeated evidence
@@ -189,8 +192,7 @@ generic task board.
 | P2 | Studio defaults and templates | Reduces repeat setup time | Repeated real projects |
 | P2 | Version change summary | Improves client confidence on revisions | Approval feedback |
 | P2 | Accepted-version receipt/PDF | Improves record keeping | Legal/content decision |
-| P2 | Current stage and today marker | Makes the accepted plan useful during the project | Alpha timeline research |
-| P2 | Actual dates and deliberate replanning | Shows change without rewriting history | Current-stage model |
+| P0 | Release and validate time passing | Makes the accepted plan useful during the project | Cookham migration and hosted build |
 | Explore | Email delivery and reminders | Reduces manual sending/follow-up | Renewed approval and provider choice |
 | Explore | Team access | Supports multi-person studios | Repeated demand from active users |
 | Explore | Client-visible progress | Extends the shared plan after acceptance | Stage/time-passing validation |

@@ -22,6 +22,13 @@ PostgreSQL policy/version tests (PGlite). Runtime code has no npm dependencies.
    the exact published version. No login is needed and no payment is taken.
 7. Open Share project to see acceptance history or download the records with the exact
    published content. Publish changes deliberately; old acceptance never approves a new version.
+8. Use Project progress to confirm the current stage, mark it complete, record who the
+   project is waiting on, or deliberately move the remaining working-day schedule.
+
+Progress and delay history is private to the owner. A published client version freezes the
+forecast dates visible at that moment; later progress does not silently rewrite an accepted
+agreement. If scope, price, terms or dates change materially, use Change project and publish
+a new version for the client.
 
 Google OAuth returns directly to the Seabird page and creates the app profile on first sign-in. Sign-in survives reloads in the same browser tab. Refresh tokens are kept in session
 storage, never passwords; closing the tab ends the saved session. Account drafts have
@@ -64,7 +71,8 @@ workspace. It does not remove the shared Cookham identity or other apps. Device 
 
 `dist/` is maintained source. `app.js` edits drafts, `model.js` handles schedules/validation,
 `cloud.js` handles sessions and cloud saves, `sharing.js` handles publication and acceptance,
-and `agreement.js` renders the webpage/PDF. Vendored pdfmake 0.2.20/fonts generate PDFs locally.
+`agreement.js` renders the webpage/PDF, and the owner-only workflow document records stage
+state, working-day replans and activity. Vendored pdfmake 0.2.20/fonts generate PDFs locally.
 
 The isolated `seabird` schema lives in Cookham. Editable projects are owner-scoped rows with
 independent revisions; the legacy workspace JSON row remains temporarily for a compatible

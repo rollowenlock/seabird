@@ -3,7 +3,16 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const when=s=>new Date(s).toLocaleString('en-NZ',{dateStyle:'medium',timeStyle:'short'});
 export const acceptanceStatement='I have reviewed and accept this version of the scope, fee, schedule and terms, and am authorised to accept on behalf of the client.';
 
-export async function shareProject({workspace,project,open,toast,download}){
+function changeSummary(previous,next){
+  if(!previous)return[];const changes=[];
+  if(JSON.stringify(previous.stagePlan)!==JSON.stringify(next.stagePlan))changes.push('schedule');
+  if(previous.fee!==next.fee||previous.currency!==next.currency||previous.deposit!==next.deposit||previous.paymentNote!==next.paymentNote)changes.push('price & payment');
+  if(JSON.stringify(previous.deliverableItems??previous.deliverables)!==JSON.stringify(next.deliverableItems??next.deliverables))changes.push('deliverables');
+  if(previous.terms!==next.terms||previous.rights!==next.rights||previous.changesPolicy!==next.changesPolicy)changes.push('terms');
+  return changes;
+}
+
+export async function shareProject({workspace,project,open,toast,download,onPublished}){
   if(!workspace?.cloud.user){workspace?.focus();toast('Sign in to your workspace to publish a client link.');return;}
   const cloud=workspace.cloud, snapshot=clientProject(structuredClone(project));
   if(!validate(snapshot)||!snapshot.title.trim()||!snapshot.client.trim()){toast('Add a project name and client before publishing.');return;}
@@ -11,15 +20,17 @@ export async function shareProject({workspace,project,open,toast,download}){
   try{row=await cloud.proposal(project.id);}catch(e){toast(e.message);return;}
   const current=row?.proposal_versions.find(v=>v.version===row.version);
   const same=current && JSON.stringify(clientProject(current.project))===JSON.stringify(snapshot);
+  const changes=changeSummary(current?.project,snapshot);
   const url=row?location.origin+location.pathname+'#proposal='+row.token:'';
   const acceptances=[...(row?.acceptances??[])].sort((a,b)=>b.version-a.version);
   const accepted=acceptances.find(a=>a.version===row.version);
-  open('Your client link',`<p class="hint">Publish the scope, fee, schedule and terms for your client. Your working rates and costs stay private. Anyone with the link can view and accept it; keep it with the intended client.</p>${row?`<div class="share-status"><b>${row.revoked?'Link revoked':`Published · version ${row.version}`}</b><p>${accepted?`Accepted ${esc(when(accepted.accepted_at))} by ${esc(accepted.name)}`:'Awaiting client acceptance'}</p></div>${!row.revoked?`<label for="share-link">Client link</label><textarea id="share-link" readonly>${esc(url)}</textarea><div class="share-buttons"><button type="button" id="copy-link">Copy link</button><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open client page ↗</a><button type="button" id="revoke-link">Revoke link</button></div>`:'<p>The old link is unavailable. A replacement gets a new address.</p><button type="button" id="replace-link">Create replacement link</button>'}`:'<p>No client link yet. Publishing also saves your draft to cloud.</p>'}<p class="hint">${row?.revoked?'':same?'The published version matches this draft.':'Publishing makes this draft the current version at the same link. Previous versions and their acceptances stay in your records.'}</p>${acceptances.length?`<details class="acceptance-history"><summary>Acceptance history (${acceptances.length})</summary>${acceptances.map(a=>`<p><b>Version ${a.version}</b> · ${esc(a.name)}<br>${esc(a.email)}<br>${esc(when(a.accepted_at))}</p>`).join('')}<button type="button" id="download-records">Download acceptance records</button><p class="hint">Names and emails are supplied by the person using the link; their identity is not independently verified.</p></details>`:''}<p id="sharing-error" role="status"></p>`,row?.revoked?null:async()=>{
+  open('Your client link',`<p class="hint">Publish the scope, fee, schedule and terms for your client. Your working rates, progress history and delay notes stay private. Anyone with the link can view and accept it; keep it with the intended client.</p>${row?`<div class="share-status"><b>${row.revoked?'Link revoked':`Published · version ${row.version}`}</b><p>${accepted?`Accepted ${esc(when(accepted.accepted_at))} by ${esc(accepted.name)}`:'Awaiting client acceptance'}</p></div>${!row.revoked?`<label for="share-link">Client link</label><textarea id="share-link" readonly>${esc(url)}</textarea><div class="share-buttons"><button type="button" id="copy-link">Copy link</button><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open client page ↗</a><button type="button" id="revoke-link">Revoke link</button></div>`:'<p>The old link is unavailable. A replacement gets a new address.</p><button type="button" id="replace-link">Create replacement link</button>'}`:'<p>No client link yet. Publishing also saves your draft to cloud.</p>'}${changes.length?`<div class="change-summary"><b>Working plan differs</b><p>This version changes: ${esc(changes.join(', '))}.</p></div>`:''}<p class="hint">${row?.revoked?'':same?'The published version matches this draft.':'Publishing makes this draft the current version at the same link. Previous versions and their acceptances stay in your records.'}</p>${acceptances.length?`<details class="acceptance-history"><summary>Acceptance history (${acceptances.length})</summary>${acceptances.map(a=>`<p><b>Version ${a.version}</b> · ${esc(a.name)}<br>${esc(a.email)}<br>${esc(when(a.accepted_at))}</p>`).join('')}<button type="button" id="download-records">Download acceptance records</button><p class="hint">Names and emails are supplied by the person using the link; their identity is not independently verified.</p></details>`:''}<p id="sharing-error" role="status"></p>`,row?.revoked?null:async()=>{
     await run(async()=>{
       await workspace.save();
       const result=await cloud.publish(project.id,snapshot,row?.version??0);
+      if(onPublished&&!same)await onPublished(result);
       document.querySelector('#dialog').close();toast(`Version ${result.version} published.`);
-      await shareProject({workspace,project,open,toast,download});
+      await shareProject({workspace,project,open,toast,download,onPublished});
     });
   },same?'Keep published version':'Publish client version');
   async function run(fn){
