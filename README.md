@@ -3,6 +3,8 @@
 Seabird brings Roll’s pricing, scope, schedule, client proposal and agreement together.
 Live: https://seabird-umber.vercel.app · Repository: https://github.com/rollowenlock/seabird
 
+Product status, priorities and release gates: [PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)
+
 ## Run and check
 
 Node.js 22 or newer. `npm ci`, then `npm run dev` (Windows: `npm.cmd`).
