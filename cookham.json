@@ -7,6 +7,7 @@
   "tables": [
     "profiles",
     "workspaces",
+    "projects",
     "proposals",
     "proposal_versions",
     "acceptances"

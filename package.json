@@ -1,1 +1,12 @@
-{"name":"seabird","private":true,"type":"module","scripts":{"test":"node --test test/*.test.js","dev":"node server.js"},"devDependencies":{"@electric-sql/pglite":"0.5.8"}}
+{
+  "name": "seabird",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --check dist/app.js && node --check dist/cloud.js && node --check dist/sharing.js && node --test test/*.test.js",
+    "dev": "node server.js"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8"
+  }
+}

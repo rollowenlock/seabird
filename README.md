@@ -12,9 +12,9 @@ PostgreSQL policy/version tests (PGlite). Runtime code has no npm dependencies.
 ## Everyday workflow
 
 1. Open Workspace and sign in using an existing Cookham email/password.
-2. On a new device, use Load cloud version. Export a backup before replacing device edits.
-3. Create/edit the project, price, deliverables, timeline and commercial terms.
-4. Save to cloud. The workspace summary distinguishes device changes from saved data.
+2. On a new device, Seabird loads the account's project list when there are no device drafts. If both exist, export a backup before choosing Load cloud projects.
+3. Create or open a project, then edit its price, deliverables, timeline and commercial terms.
+4. Save to cloud. Each changed project has its own revision, so an update on one project cannot overwrite another project.
 5. Share project → Publish client version → Copy link. Publishing also saves the draft.
 6. The client reviews the page or agreement, then enters their name/email and accepts
    the exact published version. No login is needed and no payment is taken.
@@ -26,9 +26,10 @@ storage, never passwords; closing the tab ends the saved session. Account drafts
 separate device-storage keys. Signed-out drafts remain separate and can be moved with
 JSON export/import. Email onboarding and password recovery are deferred with Cookham SMTP.
 
-Cloud saves use revision checks. A stale save is rejected rather than overwriting another
-device. Saving does not publish. Cloud loading requires explicit confirmation; it does not
-merge. Device drafts are not encrypted; export before clearing browser storage.
+Cloud saves use per-project revision checks. A stale save is rejected rather than overwriting
+another device. Saving does not publish. Cloud loading requires explicit confirmation when
+device and cloud drafts differ; it does not merge. Device drafts are not encrypted; export
+before clearing browser storage.
 
 ## Client sharing and acceptance
 
@@ -58,7 +59,9 @@ workspace. It does not remove the shared Cookham identity or other apps. Device 
 `cloud.js` handles sessions and cloud saves, `sharing.js` handles publication and acceptance,
 and `agreement.js` renders the webpage/PDF. Vendored pdfmake 0.2.20/fonts generate PDFs locally.
 
-The isolated `seabird` schema lives in Cookham. See `cookham/README.md` for backend details.
+The isolated `seabird` schema lives in Cookham. Editable projects are owner-scoped rows with
+independent revisions; the legacy workspace JSON row remains temporarily for a compatible
+rollout. See `cookham/README.md` for backend details.
 Apply migrations through Cookham’s pinned per-app ledger before releasing the frontend.
 Production-only public environment variables generate `dist/backend-config.js`; previews and
 local development default to cloud-disabled. Vercel installs with `npm ci`, runs tests and

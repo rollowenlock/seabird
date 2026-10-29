@@ -44,10 +44,16 @@ export function createCloud(settings=config, request=fetch, storage=null) {
     },
     async signIn(email,password){persist(await auth('token?grant_type=password',{email,password}));return session.user.email;},
     async join(){const existing=await data('profiles?select=user_id');if(!existing.length)await data('profiles','POST',{user_id:session.user.id});},
-    async load(){return (await data('workspaces?select=projects,revision,updated_at'))[0]||null;},
-    async save(projects,revision){
-      const result=revision===null?await data('workspaces','POST',{user_id:session.user.id,projects}):await data('workspaces?revision=eq.'+revision,'PATCH',{projects});
-      if(result.length!==1)throw new Error('Cloud workspace changed. Load the cloud version before saving.');
+    listProjects(){return data('projects?select=id,project,revision,created_at,updated_at&order=updated_at.desc');},
+    async saveProject(project,revision){
+      const path='projects?id=eq.'+encodeURIComponent(project.id)+(revision===null?'':'&revision=eq.'+revision);
+      const result=revision===null?await data('projects','POST',{user_id:session.user.id,id:project.id,project}):await data(path,'PATCH',{project});
+      if(result.length!==1)throw new Error('This project changed in the cloud. Load the cloud version before saving.');
+      return result[0];
+    },
+    async deleteProject(id,revision){
+      const result=await data('projects?id=eq.'+encodeURIComponent(id)+'&revision=eq.'+revision,'DELETE');
+      if(result.length!==1)throw new Error('This project changed in the cloud. Load it before deleting.');
       return result[0];
     },
     async proposal(id){
@@ -68,46 +74,53 @@ export function mountCloud({getProjects,setProjects,setAccount,validate,onState=
   let storage;try{storage=sessionStorage;}catch{storage=null;}
   const cloud=createCloud(config,fetch,storage);
   const panel=document.createElement('details');panel.className='cloud-panel';
-  panel.innerHTML='<summary>Workspace <span class="cloud-summary">· saved on this device</span></summary><p>Sign in to save across devices and publish a client link. Your edits stay private until you publish them.</p><form><label>Email <input name="email" type="email" autocomplete="username" required></label><label>Password <input name="password" type="password" autocomplete="current-password" required></label><button>Sign in</button></form><div class="cloud-controls" hidden><button data-cloud="save" class="primary">Save to cloud</button><button data-cloud="load">Load cloud version</button><button data-cloud="out">Sign out</button><button data-cloud="delete">Delete cloud workspace</button></div><p role="status" class="cloud-status"></p>';
+  panel.innerHTML='<summary>Workspace <span class="cloud-summary">· saved on this device</span></summary><p>Sign in to keep projects across devices and publish client links. Your edits stay private until you publish them.</p><form><label>Email <input name="email" type="email" autocomplete="username" required></label><label>Password <input name="password" type="password" autocomplete="current-password" required></label><button>Sign in</button></form><div class="cloud-controls" hidden><button data-cloud="save" class="primary">Save projects to cloud</button><button data-cloud="load">Load cloud projects</button><button data-cloud="out">Sign out</button><button data-cloud="delete">Delete Seabird cloud data</button></div><p role="status" class="cloud-status"></p>';
   document.querySelector('header').after(panel);
   const form=panel.querySelector('form'),controls=panel.querySelector('.cloud-controls'),status=panel.querySelector('.cloud-status'),summary=panel.querySelector('.cloud-summary');
-  let revision=null,baseline=null,busy=false,needsLoad=false;
+  let rows=new Map(),baseline=new Map(),busy=false,needsLoad=false;
   const stateKey=()=> 'seabird-cloud-base:'+cloud.user.id;
-  function stamp(row){revision=row?.revision??null;baseline=row?fingerprint(row.projects):null;try{localStorage.setItem(stateKey(),JSON.stringify({revision,baseline}));}catch{}needsLoad=false;}
-  function changed(){summary.textContent=cloud.user?(needsLoad?'· choose cloud version':fingerprint(getProjects())===baseline?'· saved to cloud':'· device changes to save'):'· saved on this device';onState();}
+  const projectFingerprint=items=>fingerprint(Object.fromEntries(items.map(project=>[project.id,project])));
+  function stamp(nextRows){rows=new Map(nextRows.map(row=>[row.id,row]));baseline=new Map(nextRows.map(row=>[row.id,fingerprint(row.project)]));try{localStorage.setItem(stateKey(),JSON.stringify({revisions:Object.fromEntries(nextRows.map(row=>[row.id,row.revision])),baseline:Object.fromEntries(baseline)}));}catch{}needsLoad=false;}
+  function changed(){const local=getProjects(),synced=local.length===baseline.size&&local.every(project=>baseline.get(project.id)===fingerprint(project));summary.textContent=cloud.user?(needsLoad?'· choose cloud version':synced?'· saved to cloud':'· device changes to save'):'· saved on this device';onState();}
   async function run(fn){if(busy)return;busy=true;panel.querySelectorAll('button').forEach(b=>b.disabled=true);status.textContent='Working…';try{await fn();}catch(e){status.textContent=e.message;}finally{busy=false;panel.querySelectorAll('button').forEach(b=>b.disabled=false);changed();}}
   async function connect(){
     await cloud.join();setAccount(cloud.user.id);
     form.hidden=true;controls.hidden=false;
     needsLoad=true;
-    const row=await cloud.load();let saved=null;try{saved=JSON.parse(localStorage.getItem(stateKey())||'null');}catch{}
-    if(row && (!Array.isArray(row.projects)||!row.projects.length||!row.projects.every(validate)))throw new Error('Cloud workspace is invalid. Your device draft is unchanged.');
-    if(!row){stamp(null);}
-    else if(fingerprint(getProjects())===fingerprint(row.projects)){stamp(row);}
-    else if(saved?.revision===row.revision){revision=row.revision;baseline=saved.baseline;needsLoad=false;}
-    else{revision=null;baseline=null;}
-    status.textContent=`Signed in as ${cloud.user.email}. `+(needsLoad?'A cloud workspace exists. Export any device changes before loading it.':row?'Your device draft is ready. Save changes to cloud when ready.':'Save your first project to cloud when ready.');
+    const cloudRows=await cloud.listProjects(),cloudProjects=cloudRows.map(row=>row.project);let saved=null;try{saved=JSON.parse(localStorage.getItem(stateKey())||'null');}catch{}
+    if(!cloudProjects.every(validate))throw new Error('A cloud project is invalid. Your device draft is unchanged.');
+    if(!cloudRows.length){stamp([]);}
+    else if(!getProjects().length){stamp(cloudRows);setProjects(cloudProjects);}
+    else if(projectFingerprint(getProjects())===projectFingerprint(cloudProjects)){stamp(cloudRows);}
+    else if(saved?.revisions&&cloudRows.every(row=>saved.revisions[row.id]===row.revision)){
+      rows=new Map(cloudRows.map(row=>[row.id,row]));baseline=new Map(Object.entries(saved.baseline||{}));needsLoad=false;
+    }else{rows=new Map();baseline=new Map();}
+    status.textContent=`Signed in as ${cloud.user.email}. `+(needsLoad?'Cloud projects exist. Export any device changes before loading them.':cloudRows.length?'Your projects are ready. Save device changes when you want them in the cloud.':'Create your first project, then save it to cloud.');
   }
   const controller={cloud,changed,focus(){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'start'});form.querySelector('input').focus();},async save(){
     if(!cloud.user)throw new Error('Sign in to your workspace to publish a client link.');
-    if(needsLoad)throw new Error('Load your cloud workspace before saving. Export device changes first if you want to keep them.');
+    if(needsLoad)throw new Error('Load your cloud projects before saving. Export device changes first if you want to keep them.');
     const snapshot=structuredClone(getProjects());
-    if(!snapshot.length||!snapshot.every(validate))throw new Error('Please check the project details before saving.');
-    const row=await cloud.save(snapshot,revision);stamp(row);changed();return row;
+    if(!snapshot.every(project=>validate(project)&&typeof project.id==='string'&&project.id.length>0))throw new Error('Please check the project details before saving.');
+    for(const project of snapshot){
+      if(baseline.get(project.id)===fingerprint(project))continue;
+      const row=await cloud.saveProject(project,rows.get(project.id)?.revision??null);rows.set(project.id,row);
+    }
+    stamp([...rows.values()]);changed();return [...rows.values()];
   }};
   if(!cloud.enabled){form.hidden=true;status.textContent='Local preview: cloud saving and publishing are available on the live app.';return controller;}
   form.addEventListener('submit',e=>{e.preventDefault();run(async()=>{await cloud.signIn(form.elements.email.value,form.elements.password.value);form.elements.password.value='';await connect();});});
   controls.addEventListener('click',e=>{const action=e.target.dataset.cloud;if(!action)return;run(async()=>{
-    if(action==='save'){await controller.save();status.textContent='Saved to cloud. Published client versions are unchanged.';}
+    if(action==='save'){await controller.save();status.textContent='Projects saved to cloud. Published client versions are unchanged.';}
     else if(action==='load'){
-      if(!confirm('Load the cloud version and replace this device’s current workspace? Export a backup first to keep device changes.')){status.textContent='Load cancelled.';return;}
-      const row=await cloud.load();if(!row||!Array.isArray(row.projects)||!row.projects.length||!row.projects.every(validate))throw new Error('No valid cloud workspace found.');
-      stamp(row);setProjects(row.projects);status.textContent='Cloud version loaded. Edit privately, then save or publish when ready.';
+      if(!confirm('Load cloud projects and replace this device’s current project list? Export a backup first to keep device changes.')){status.textContent='Load cancelled.';return;}
+      const nextRows=await cloud.listProjects();if(!nextRows.length||!nextRows.every(row=>validate(row.project)))throw new Error('No valid cloud projects found.');
+      stamp(nextRows);setProjects(nextRows.map(row=>row.project));status.textContent='Cloud projects loaded. Edit privately, then save or publish when ready.';
     }else if(action==='out'){
-      try{await cloud.signOut();}finally{setAccount(null);form.hidden=false;controls.hidden=true;revision=null;baseline=null;needsLoad=false;status.textContent='Signed out. Your account’s device draft is kept separately.';}
+      try{await cloud.signOut();}finally{setAccount(null);form.hidden=false;controls.hidden=true;rows=new Map();baseline=new Map();needsLoad=false;status.textContent='Signed out. Your account’s device draft is kept separately.';}
     }else if(action==='delete'){
       if(prompt('Type DELETE to remove your Seabird cloud workspace, published links and acceptance records. Your shared Cookham sign-in stays.')!=='DELETE'){status.textContent='Deletion cancelled.';return;}
-      await cloud.remove();try{await cloud.signOut();}finally{setAccount(null);form.hidden=false;controls.hidden=true;revision=null;baseline=null;needsLoad=false;status.textContent='Seabird cloud workspace deleted.';}
+      await cloud.remove();try{await cloud.signOut();}finally{setAccount(null);form.hidden=false;controls.hidden=true;rows=new Map();baseline=new Map();needsLoad=false;status.textContent='Seabird cloud workspace deleted.';}
     }
   });});
   controller.ready=run(async()=>{const user=await cloud.restore();if(user)await connect();else status.textContent='Use your existing Cookham account. Sign-in lasts for this browser tab, including reloads.';});

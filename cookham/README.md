@@ -1,17 +1,20 @@
 # Seabird backend
 
-App-owned schema `seabird`: profiles are explicit memberships; workspaces contain
-private proposal arrays, a server-controlled revision and timestamp. No dependency
-on another app's business data, no privileged runtime key, storage buckets or jobs.
+App-owned schema `seabird`: profiles are explicit memberships; projects are private
+owner-scoped rows containing one editable project document, an independent revision
+and timestamps. The legacy workspace array remains during rollout and mirrors writes
+forward into project rows. No dependency on another app's business data, no privileged
+runtime key, storage buckets or jobs.
 Only a user's own membership/workspace is accessible. App deletion cascades its
 workspace but retains shared Auth. Sign-in uses the existing Cookham credentials;
 email delivery/new-account registration remains deferred. Sessions persist in
 sessionStorage across reloads of the same tab, with refresh-token rotation.
 Passwords are never stored. Account drafts use distinct local-storage keys.
 
-Cloud Save/Load is explicit. Updates compare the loaded revision and stop on a
-conflict. Load is required before editing an existing cloud workspace on a new
-device. Browser drafts use a new storage key; legacy proposals are not imported.
+Cloud Save/Load is explicit. Updates compare each project's loaded revision and stop
+on a conflict. A new device loads the project list automatically when it has no account
+drafts; conflicting device and cloud drafts require an explicit load. Browser drafts
+remain separate from cloud records.
 New client links use random tokens and narrow read/accept RPCs. The proposals,
 proposal_versions and acceptances tables are owner-readable only. Owner publish
 and revoke RPCs check identity and membership. Public RPCs require the exact token,

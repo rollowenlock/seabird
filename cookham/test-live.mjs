@@ -13,13 +13,13 @@ try{
  const client=createCloud({url,key,schema:'seabird'});await client.signIn(email,password);clients.push(client);await client.join();
  }
  const [a,b]=clients;
- assert.equal(await a.load(),null);assert.equal(await b.load(),null);
- const saved=await a.save([{title:'Private fixture'}],null);assert.equal(saved.revision,1);
- assert.equal(await b.load(),null);await assert.rejects(b.save([{title:'Attack'}],1),/changed/);
- const second=await a.save([{title:'Updated fixture'}],1);assert.equal(second.revision,2);
- await assert.rejects(a.save([{title:'Stale'}],1),/changed/);
- const anon=await fetch(url+'/rest/v1/workspaces?select=*',{headers:{apikey:key,'Accept-Profile':'seabird'}});assert.equal(anon.ok,false);
  const draft={...example(),title:'TEST ONLY — no real agreement',terms:'Disposable software test. No contract, service or payment.',fee:0};
+ assert.deepEqual(await a.listProjects(),[]);assert.deepEqual(await b.listProjects(),[]);
+ const saved=await a.saveProject(draft,null);assert.equal(saved.revision,1);
+ assert.deepEqual(await b.listProjects(),[]);
+ const second=await a.saveProject({...draft,title:'Updated fixture'},1);assert.equal(second.revision,2);
+ await assert.rejects(a.saveProject({...draft,title:'Stale'},1),/changed/);
+ const anon=await fetch(url+'/rest/v1/projects?select=*',{headers:{apikey:key,'Accept-Profile':'seabird'}});assert.equal(anon.ok,false);
  const publicClient=createCloud({url,key,schema:'seabird'});
  const link=await a.publish(draft.id,draft,0);assert.equal(link.version,1);
  const viewed=await publicClient.read(link.token);assert.equal(viewed.project.title,draft.title);assert.equal(viewed.project.rate,undefined);
@@ -33,9 +33,10 @@ try{
  await assert.rejects(publicClient.accept(link.token,2,'Test Client','fixture@example.test',true));
  await a.manage(draft.id,'replace');assert.equal(await publicClient.read(link.token),null);
  console.log('PASS: hosted publication, safe anonymous read, owner isolation, exact-version acceptance, history, stale-page rejection and revocation.');
- await a.remove();assert.equal(await a.load(),null);
+ await a.remove();assert.deepEqual(await a.listProjects(),[]);
  assert.equal((await fetch(url+'/auth/v1/admin/users/'+users[0],{headers})).ok,true);
- assert.equal((await b.save([{title:'Other user intact'}],null)).revision,1);
+ const other={...example(),id:crypto.randomUUID(),title:'Other user intact'};
+ assert.equal((await b.saveProject(other,null)).revision,1);
  console.log('PASS: real sign-in, membership, cloud save/load, two-user isolation, stale-write conflict, anonymous denial, app deletion and shared identity retention.');
 }finally{
  for(const client of clients){await client.remove();await client.signOut().catch(()=>{});}

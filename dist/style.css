@@ -49,3 +49,14 @@ button:disabled{cursor:wait;opacity:.5}
 .acceptance-panel .pair label{flex:1}.acceptance-check{display:flex;align-items:start;gap:12px;font-size:13px;line-height:1.6;margin:20px 0}
 .acceptance-check input{width:18px;height:18px;flex-shrink:0;margin-top:3px}.acceptance-panel [role=status]{color:#6e3a22}
 @media(max-width:600px){.cloud-panel{margin:12px 22px;padding:16px}.cloud-panel form{display:block}.cloud-panel input{margin-bottom:12px}.acceptance-panel{padding:22px}.acceptance-panel .pair{display:block}}
+.projects-home .intro{align-items:center;margin-top:0}.projects-home h1{margin-top:16px}.project-count{white-space:nowrap;font-size:13px;color:var(--muted)}
+.project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.project-tile{display:flex;flex-direction:column;text-align:left;padding:26px;border-radius:12px;background:#fffef9;min-height:260px;overflow-wrap:anywhere}
+.project-tile:hover{background:#eef1e7;border-color:#9eaf8c}.project-client{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.project-tile h2{font-size:25px;letter-spacing:-.7px;font-weight:500;margin:18px 0 8px}.project-tile p{font-size:13px;color:var(--muted);font-weight:400;margin:0 0 26px}
+.project-tile-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+.project-open{font-size:12px;margin-top:22px}.projects-empty{text-align:center;border:1px dashed #c8cbbf;border-radius:16px;padding:65px 24px;background:#efefe7}
+.empty-symbol{font-size:42px;color:#728664}.projects-empty h2{font-weight:450;font-size:29px;letter-spacing:-.7px}.projects-empty p{max-width:460px;margin:0 auto 25px;color:var(--muted);font-size:14px}
+.projects-tools{display:flex;gap:20px;justify-content:space-between;align-items:center;margin-top:32px}.projects-tools p{max-width:420px;font-size:12px;color:var(--muted)}.projects-tools>div{display:flex;gap:8px}
+@media(max-width:950px){.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.project-grid{grid-template-columns:1fr}.projects-home .intro{display:block}.project-count{display:block;margin-top:16px}.projects-tools{display:block}.projects-empty{padding:38px 20px}.project-tile{min-height:230px}}

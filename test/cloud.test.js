@@ -23,20 +23,31 @@ test('parallel requests share a single refresh and public links never send a use
     if(url.includes('refresh_token')){refreshes++;await new Promise(r=>setTimeout(r,10));return Response.json({user:{id:'a'},access_token:'new',refresh_token:'r2',expires_in:3600});}
     return Response.json([]);
   });
-  await cloud.signIn('a','b');await Promise.all([cloud.load(),cloud.load()]);assert.equal(refreshes,1);
+  await cloud.signIn('a','b');await Promise.all([cloud.listProjects(),cloud.listProjects()]);assert.equal(refreshes,1);
   await cloud.read('token');assert.equal(calls.at(-1).options.headers.Authorization,undefined);
 });
-test('cloud writes are schema scoped and reject a stale revision',async()=>{
+test('project writes are schema scoped and reject a stale revision',async()=>{
   const calls=[];
   const cloud=createCloud(settings,async(url,options)=>{
     calls.push({url,...options});
     return Response.json(url.includes('/auth/')?{user:{id:'a',email:'a@example.com'},access_token:'test',expires_at:Date.now()/1000+3600}:[]);
   });
   await cloud.signIn('a@example.com','password');
-  await assert.rejects(cloud.save([{title:'Test'}],3),/changed/);
-  assert.match(calls[1].url,/revision=eq.3$/);
+  await assert.rejects(cloud.saveProject({id:'project-a',title:'Test'},3),/changed/);
+  assert.match(calls[1].url,/projects\?id=eq.project-a&revision=eq.3$/);
   assert.equal(calls[1].headers['Content-Profile'],'seabird');
-  assert.deepEqual(JSON.parse(calls[1].body),{projects:[{title:'Test'}]});
+  assert.deepEqual(JSON.parse(calls[1].body),{project:{id:'project-a',title:'Test'}});
+});
+test('new project rows carry the signed-in owner and stable project ID',async()=>{
+  const calls=[];
+  const cloud=createCloud(settings,async(url,options)=>{
+    calls.push({url,...options});
+    if(url.includes('/auth/'))return Response.json({user:{id:'owner-a'},access_token:'test',expires_at:Date.now()/1000+3600});
+    return Response.json([{id:'project-a',project:{id:'project-a'},revision:1}]);
+  });
+  await cloud.signIn('a@example.com','password');const row=await cloud.saveProject({id:'project-a'},null);
+  assert.equal(row.revision,1);assert.match(calls[1].url,/rest\/v1\/projects$/);
+  assert.deepEqual(JSON.parse(calls[1].body),{user_id:'owner-a',id:'project-a',project:{id:'project-a'}});
 });
 test('cloud deletion targets own app membership only',async()=>{
   const calls=[];
