@@ -5,27 +5,62 @@ Updated: 30 October 2026
 ## Product direction
 
 Seabird helps a small creative studio turn an initial project conversation into a clear,
-client-approved scope, fee, schedule and working agreement.
+client-approved plan, then keep that plan useful as the work moves through its stages.
 
 The primary user is currently a solo studio owner or freelancer. The client does not need
 an account. Seabird should feel simpler than a general project-management system because its
 first job is to get a project clearly agreed and ready to begin.
 
 **Core promise:** create a credible project proposal in less than 15 minutes, share one link,
-and retain a clear record of exactly what the client accepted.
+retain a clear record of exactly what the client accepted, and always understand where the
+project is now.
 
 ## Product lifecycle
 
 1. A studio owner signs in.
 2. They create or reopen a project.
-3. They define the deliverables, fee, schedule, responsibilities, payment terms and change policy.
+3. They define the deliverables, price, stages, timeline, responsibilities, payment terms and change policy.
 4. They preview exactly what the client will see.
 5. They publish a versioned client link.
 6. The client reviews the proposal and agreement without creating an account.
 7. The client records acceptance of that exact version.
 8. The studio retains the accepted version and acceptance record.
+9. As time passes, Seabird shows the current stage, what is coming next and whether the plan has moved.
 
-Everything after acceptance is a possible expansion, not part of the current core promise.
+Seabird does not need to become a general task manager to remain useful after acceptance. Its job
+is to keep the agreed project legible as planned time becomes real time.
+
+## The seven product areas
+
+These are Seabird's canonical product areas. Authentication, cloud storage, sharing, notifications
+and analytics support them, but are not the product's organising model.
+
+| Area | Product question | Current position |
+| --- | --- | --- |
+| **Price** | What will the project cost, what sits behind that figure, and when is it paid? | Strong initial implementation: private costing, agreed fee, currency, tax, deposit and payment wording. |
+| **Timeline** | When does the project begin and finish, and what is the overall sequence? | Strong planned timeline generated from working-day durations. It does not yet react visibly to today's date or actual progress. |
+| **Deliverables** | What exactly is being made and to what specification? | Strong structured implementation with named outputs and technical specifications. |
+| **Terms** | What are the rules, responsibilities, rights and consequences of change? | Strong editable implementation; the starter wording still needs content/legal review. |
+| **Agreement** | What exact combination of price, timeline, deliverables and terms did the client accept? | Versioned publication, readable agreement, PDF and recorded acceptance are built; the current hosted journey still needs final validation. |
+| **Stages** | What are the meaningful phases of the work, who owns each phase and how does work move between them? | Planned stages and owners are generated, but they are not yet live project states that can be completed, delayed or moved. |
+| **Time passing** | Where are we today, what should be happening now, what is next and what has slipped? | Not yet implemented as a product system. This is the largest defined area still to design. |
+
+The relationship is:
+
+```text
+Deliverables + Price + Terms + Stages
+                 │
+                 ├── create the Timeline
+                 └── freeze into the Agreement
+
+After acceptance: Time passing moves through the Stages and tests reality against the Timeline.
+```
+
+This creates three clear modes without adding a generic task board:
+
+1. **Define** — deliverables, price, terms and stages.
+2. **Agree** — timeline, client view, agreement and acceptance.
+3. **Progress** — current stage, elapsed time, upcoming moments, delays and deliberate replanning.
 
 ## Status language
 
@@ -55,7 +90,9 @@ Everything after acceptance is a possible expansion, not part of the current cor
 | Project deletion and archiving | **Partial** | Backend supports owner-scoped project deletion and whole Seabird workspace deletion. | Add safe project-level archive/delete UI and recovery expectations. |
 | Mobile experience | **Partial** | Responsive styles and earlier mobile checks exist. | Retest the full current create, edit, publish and accept journey on a real phone. |
 | Collaboration and permissions | **Not started** | Projects currently have one owner. Clients only receive public proposal links. | Do not build team roles until solo users prove the core workflow and describe a concrete collaboration need. |
-| Delivery management | **Not started** | The agreed schedule is visible, but there are no tasks, files, progress updates or completion workflow. | Research whether users want a light post-acceptance handoff or prefer Seabird to stop at agreement. |
+| Tasks, files and chat | **Not started** | Seabird has no task board, file store or project chat. | Keep these outside the defined product unless stage and time-passing research demonstrates a specific missing job. |
+| Stages as live project state | **Partial** | Direction, making, review and delivery stages have planned dates, durations, owners and client-visible descriptions. | Add current/upcoming/completed state, actual transition dates and deliberate delay/replan actions. |
+| Time passing | **Not started** | The timeline is calculated from project inputs. | Add a today marker, current-stage view, upcoming moments, elapsed/remaining time, overdue states and a clear distinction between the accepted baseline and the working forecast. |
 | Notifications and email | **Not started** | No email is sent by Seabird. | Possible later work: send proposal, remind client and issue acceptance receipt. This requires renewed approval before setup. |
 | Billing | **Not started** | No subscriptions, invoices or payments. | Keep out of the alpha until usage demonstrates value and a charging model is chosen. |
 | Product analytics and support | **Not started** | Automated technical tests exist; there is no product event funnel or in-product feedback route. | Add privacy-conscious activation/publish/acceptance events and a simple tester feedback channel before expanding the alpha. |
@@ -119,19 +156,23 @@ Goal: make sending, reviewing and recording approval feel professionally complet
 **Exit criteria:** testers trust the acceptance record for their normal work; clients understand what
 they are accepting; republishing never creates ambiguity about which version is current.
 
-### Milestone 3 — Choose the product boundary
+### Milestone 3 — Make the agreed plan live
 
-Goal: decide whether Seabird ends at agreement or continues into delivery.
+Goal: keep Seabird useful after acceptance by showing how the real project is moving through the agreed plan.
 
-Research before building:
+Design and validate:
 
-- Do users need milestones and client progress updates after acceptance?
-- Do they need shared files or only links to their existing file tools?
-- Do multiple studio members need access to the same project?
-- Is proposal-to-acceptance valuable enough as a focused product on its own?
+- A clear today marker and current stage.
+- Upcoming stage transitions, client reviews and delivery moments.
+- Completed, active, upcoming and late stage states.
+- Actual stage transition dates without rewriting the accepted agreement.
+- A deliberate replan flow that distinguishes the accepted baseline from the latest forecast.
+- A simple record of why a timeline moved and who is responsible for the next action.
 
-Only add delivery tracking, team roles, invoicing or payments when repeated customer evidence
-shows that the feature belongs inside Seabird. Avoid turning the product into a generic task board.
+Research whether clients should see live progress and whether reminders belong here. Continue to
+exclude task lists, chat, file management, team roles, invoicing and payments until repeated evidence
+shows they are required. Stages and time passing should deepen Seabird's plan, not turn it into a
+generic task board.
 
 ## Prioritised backlog
 
@@ -148,9 +189,11 @@ shows that the feature belongs inside Seabird. Avoid turning the product into a 
 | P2 | Studio defaults and templates | Reduces repeat setup time | Repeated real projects |
 | P2 | Version change summary | Improves client confidence on revisions | Approval feedback |
 | P2 | Accepted-version receipt/PDF | Improves record keeping | Legal/content decision |
+| P2 | Current stage and today marker | Makes the accepted plan useful during the project | Alpha timeline research |
+| P2 | Actual dates and deliberate replanning | Shows change without rewriting history | Current-stage model |
 | Explore | Email delivery and reminders | Reduces manual sending/follow-up | Renewed approval and provider choice |
 | Explore | Team access | Supports multi-person studios | Repeated demand from active users |
-| Explore | Delivery milestones | Extends value after acceptance | Product-boundary research |
+| Explore | Client-visible progress | Extends the shared plan after acceptance | Stage/time-passing validation |
 | Later | Billing and payments | Monetisation | Demonstrated retention and pricing decision |
 
 ## Product metrics
