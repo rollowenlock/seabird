@@ -13,9 +13,11 @@ test('project rows migrate existing drafts and enforce owner isolation with revi
     try{return (await db.query(sql,args)).rows;}finally{await db.exec('reset role');}
   }
   try{
-    await db.exec(`create role anon;create role authenticated;create schema auth;
+    await db.exec(`create role anon;create role authenticated;create schema auth;create schema storage;
       grant usage on schema auth to authenticated;
       create table auth.users(id uuid primary key);
+      create table storage.buckets(id text primary key,name text not null,public boolean not null default false,file_size_limit bigint,allowed_mime_types text[]);
+      create table storage.objects(id bigint generated always as identity primary key,bucket_id text not null,name text not null);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       create function auth.jwt() returns jsonb language sql stable as $$select '{}'::jsonb$$;
       insert into auth.users values('${alice}'),('${bob}');`);
@@ -23,6 +25,15 @@ test('project rows migrate existing drafts and enforce owner isolation with revi
     const files=(await readdir(dir)).filter(file=>file.endsWith('.sql')).sort();
     for(const file of files.filter(file=>!file.includes('add_project_records')))await db.exec(await readFile(new URL(file,dir),'utf8'));
     for(const id of [alice,bob])await as('authenticated',id,'insert into seabird.profiles(user_id) values($1)',[id]);
+    const profile=(await as('authenticated',alice,"update seabird.profiles set display_name='Northlight Films',organisation_type='studio',work_types=array['Motion design','Animation'] where user_id=$1 returning display_name,organisation_type,work_types",[alice]))[0];
+    assert.equal(profile.display_name,'Northlight Films');assert.equal(profile.organisation_type,'studio');assert.deepEqual(profile.work_types,['Motion design','Animation']);
+    const onboarded=(await as('authenticated',alice,"update seabird.profiles set provider_label='Studio',project_defaults=$2,onboarding_completed_at=now() where user_id=$1 returning provider_label,project_defaults,onboarding_completed_at",[alice,JSON.stringify({currency:'AUD',rate:900,makingStageName:'Production',reviews:3})]))[0];
+    assert.equal(onboarded.provider_label,'Studio');assert.equal(onboarded.project_defaults.makingStageName,'Production');assert.ok(onboarded.onboarding_completed_at);
+    assert.equal((await as('authenticated',bob,'select user_id from seabird.profiles where user_id=$1',[alice])).length,0);
+    await assert.rejects(as('authenticated',alice,"update seabird.profiles set organisation_type='agency' where user_id=$1",[alice]));
+    await assert.rejects(as('authenticated',alice,"update seabird.profiles set work_types=array_fill('x'::text,array[13]) where user_id=$1",[alice]));
+    await assert.rejects(as('authenticated',alice,"update seabird.profiles set project_defaults='{\"currency\":\"BTC\"}'::jsonb where user_id=$1",[alice]));
+    await assert.rejects(as('authenticated',alice,"update seabird.profiles set project_defaults='{\"unknown\":true}'::jsonb where user_id=$1",[alice]));
 
     const legacy={...example(),id:'legacy-project',title:'Existing workspace project'};
     await as('authenticated',alice,'insert into seabird.workspaces(user_id,projects) values($1,$2)',[alice,JSON.stringify([legacy])]);

@@ -11,6 +11,9 @@ test('the complete timeline fits its card instead of becoming horizontally scrol
   assert.doesNotMatch(css,/\.timeline-scroll\{[^}]*overflow-x:auto/);
   assert.doesNotMatch(css,/\.timeline\{[^}]*min-width:670px/);
   assert.match(app,/--stage-count:\$\{s\.length\}/);
+  assert.match(app,/class="today-marker\$\{edge\}\$\{outside\}"/);
+  assert.match(css,/\.today-marker\{[^}]*position:absolute[^}]*left:var\(--today\)/);
+  assert.match(css,/\.today-marker\.is-before::after,.today-marker\.is-after::after\{display:none\}/);
 });
 
 test('mobile keeps stage details and forms usable without widening the page',()=>{
@@ -19,4 +22,11 @@ test('mobile keeps stage details and forms usable without widening the page',()=
   assert.match(css,/@media\(max-width:600px\)\{body\{overflow-x:hidden\}/);
   assert.match(css,/\.pair\{grid-template-columns:1fr\}/);
   assert.match(css,/\.mobile-stage-picker select\{width:100%\}/);
+  assert.match(app,/v\.start===v\.end\?' is-point'/);
+  assert.match(css,/\.stage\.is-point \.stage-label-compact\{display:none\}/);
+  assert.match(app,/class="onboarding-card"/);
+  assert.match(css,/\.choice-grid\{grid-template-columns:1fr 1fr\}/);
+  assert.match(css,/\.onboarding-numbers\{grid-template-columns:1fr\}/);
+  assert.match(css,/\.auth-home\{margin-top:7vh;padding:34px 22px\}/);
+  assert.match(css,/\.auth-home \.google-signin\{[^}]*color:var\(--ink\)/);
 });

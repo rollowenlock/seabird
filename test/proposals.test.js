@@ -14,9 +14,11 @@ test('published versions enforce ownership, privacy, stale acceptance and revoca
   }
   const rpc=(role,id,name,args)=>as(role,id,`select seabird.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) as result`,args).then(r=>r[0].result);
   try{
-    await db.exec(`create role anon;create role authenticated;create schema auth;
+    await db.exec(`create role anon;create role authenticated;create schema auth;create schema storage;
       grant usage on schema auth to authenticated;
       create table auth.users(id uuid primary key);
+      create table storage.buckets(id text primary key,name text not null,public boolean not null default false,file_size_limit bigint,allowed_mime_types text[]);
+      create table storage.objects(id bigint generated always as identity primary key,bucket_id text not null,name text not null);
       create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       create function auth.jwt() returns jsonb language sql stable as $$select '{}'::jsonb$$;
       insert into auth.users values('${alice}'),('${bob}');`);

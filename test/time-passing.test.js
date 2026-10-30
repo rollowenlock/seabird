@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   addWorkingDays,clientProject,completeStage,currentStageStatus,example,
-  refreshUnstartedPlan,setStageWaiting,shiftRemainingStages,stages,startTracking,
+  refreshUnstartedPlan,scheduleDatePosition,setStageWaiting,shiftRemainingStages,stages,startTracking,
   todayInTimeZone,validate,validStagePlan,workingDaysBetween
 } from '../dist/model.js';
 
@@ -12,6 +12,13 @@ test('working-day countdowns cross weekends and preserve direction',()=>{
   assert.equal(workingDaysBetween('2026-10-30','2026-11-03'),2);
   assert.equal(workingDaysBetween('2026-11-03','2026-10-30'),-2);
   assert.equal(todayInTimeZone('Pacific/Auckland',new Date('2026-10-29T12:30:00Z')),'2026-10-30');
+});
+
+test('today has a stable proportional position across the visual schedule',()=>{
+  assert.equal(scheduleDatePosition('2026-11-01','2026-11-11','2026-10-30'),0);
+  assert.equal(scheduleDatePosition('2026-11-01','2026-11-11','2026-11-06'),50);
+  assert.equal(scheduleDatePosition('2026-11-01','2026-11-11','2026-11-20'),100);
+  assert.throws(()=>scheduleDatePosition('2026-11-11','2026-11-01','2026-11-06'),/schedule date/);
 });
 
 test('tracking setup records prior stages without invented actual dates',()=>{

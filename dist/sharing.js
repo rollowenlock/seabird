@@ -1,4 +1,4 @@
-import {clientProject,validate} from './model.js';
+import {clientProject,providerIdentity,validate} from './model.js';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const when=s=>new Date(s).toLocaleString('en-NZ',{dateStyle:'medium',timeStyle:'short'});
 export const acceptanceStatement='I have reviewed and accept this version of the scope, fee, schedule and terms, and am authorised to accept on behalf of the client.';
@@ -14,7 +14,7 @@ function changeSummary(previous,next){
 
 export async function shareProject({workspace,project,open,toast,download,onPublished}){
   if(!workspace?.cloud.user){workspace?.focus();toast('Sign in to your workspace to publish a client link.');return;}
-  const cloud=workspace.cloud, snapshot=clientProject(structuredClone(project));
+  const cloud=workspace.cloud, source=structuredClone(project),identity=providerIdentity(workspace.profile);if(identity)source.provider=identity;const snapshot=clientProject(source);
   if(!validate(snapshot)||!snapshot.title.trim()||!snapshot.client.trim()){toast('Add a project name and client before publishing.');return;}
   let row;
   try{row=await cloud.proposal(project.id);}catch(e){toast(e.message);return;}
@@ -51,7 +51,8 @@ export async function shareProject({workspace,project,open,toast,download,onPubl
 
 export function acceptancePanel({cloud,token,record,reload}){
   const panel=document.createElement('section');panel.className='acceptance-panel';panel.setAttribute('aria-label','Client acceptance');
-  panel.innerHTML=`<span class="section-label">VERSION ${record.version} · PUBLISHED ${esc(when(record.published_at))}</span><h2>${record.accepted_at?'Acceptance recorded':'Ready to go ahead?'}</h2>${record.accepted_at?`<p>This version was accepted on ${esc(when(record.accepted_at))}. Keep a PDF of the agreement for your records.</p>`:`<p>Review the agreement and all project details above before accepting.</p><form><div class="pair"><label>Your full name<input name="name" maxlength="200" autocomplete="name" required></label><label>Your email<input name="email" type="email" maxlength="254" autocomplete="email" required></label></div><label class="acceptance-check"><input name="agreed" type="checkbox" required><span>${acceptanceStatement}</span></label><button class="primary">Accept version ${record.version}</button><p class="hint">Your name, email, the version and acceptance time will be recorded for Roll. No payment is taken.</p><p role="status"></p></form>`}`;
+  const provider=record.project?.provider?.displayName||'the project provider';
+  panel.innerHTML=`<span class="section-label">VERSION ${record.version} · PUBLISHED ${esc(when(record.published_at))}</span><h2>${record.accepted_at?'Acceptance recorded':'Ready to go ahead?'}</h2>${record.accepted_at?`<p>This version was accepted on ${esc(when(record.accepted_at))}. Keep a PDF of the agreement for your records.</p>`:`<p>Review the agreement and all project details above before accepting.</p><form><div class="pair"><label>Your full name<input name="name" maxlength="200" autocomplete="name" required></label><label>Your email<input name="email" type="email" maxlength="254" autocomplete="email" required></label></div><label class="acceptance-check"><input name="agreed" type="checkbox" required><span>${acceptanceStatement}</span></label><button class="primary">Accept version ${record.version}</button><p class="hint">Your name, email, the version and acceptance time will be recorded for ${esc(provider)}. No payment is taken.</p><p role="status"></p></form>`}`;
   const form=panel.querySelector('form');
   if(form)form.onsubmit=async e=>{
     e.preventDefault();const button=form.querySelector('button');if(button.disabled)return;button.disabled=true;

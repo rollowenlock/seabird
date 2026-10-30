@@ -76,3 +76,29 @@ test('cloud deletion targets own app membership only',async()=>{
   assert.match(calls[1].url,/rest\/v1\/profiles\?user_id=eq.own-id$/);
   assert.equal(calls[1].method,'DELETE');
 });
+test('organisation settings stay in the profile and logo storage is account scoped',async()=>{
+  const calls=[];
+  const cloud=createCloud(settings,async(url,options)=>{
+    calls.push({url,...options});
+    if(url.includes('/auth/'))return Response.json({user:{id:'owner-a'},access_token:'test',expires_at:Date.now()/1000+3600});
+    if(url.includes('/storage/'))return Response.json({Key:'owner-a/logo'});
+    return Response.json([{display_name:'Northlight Films',organisation_type:'studio',work_types:['Motion design'],logo_path:'owner-a/logo',updated_at:'2026-10-30T00:00:00Z'}]);
+  });
+  await cloud.signIn('a@example.com','password');
+  const saved=await cloud.saveProfile({display_name:'Northlight Films',organisation_type:'studio',work_types:['Motion design'],logo_path:null});
+  assert.equal(saved.display_name,'Northlight Films');assert.match(calls[1].url,/profiles\?user_id=eq.owner-a$/);assert.equal(calls[1].method,'PATCH');
+  const logo=new Blob(['logo'],{type:'image/png'});assert.equal(await cloud.uploadLogo(logo),'owner-a/logo');
+  assert.match(calls[2].url,/storage\/v1\/object\/seabird-branding\/owner-a\/logo$/);assert.equal(calls[2].headers['x-upsert'],'true');
+  assert.equal(cloud.logoUrl('owner-a/logo','v1'),'https://example.supabase.co/storage/v1/object/public/seabird-branding/owner-a/logo?v=v1');
+  await cloud.removeLogo('owner-a/logo');assert.equal(calls[3].method,'DELETE');assert.match(calls[3].url,/storage\/v1\/object\/seabird-branding$/);assert.deepEqual(JSON.parse(calls[3].body),{prefixes:['owner-a/logo']});
+  await assert.rejects(cloud.uploadLogo(new Blob(['x'],{type:'image/svg+xml'})),/PNG, JPEG or WebP/);
+});
+
+test('onboarding preferences are profile-owned and fetched with completion state',async()=>{
+  const calls=[];
+  const profile={display_name:'River Studio',organisation_type:'other',provider_label:'Collective',work_types:['Sound design'],project_defaults:{currency:'AUD',makingStageName:'Production'},onboarding_completed_at:'2026-10-30T10:00:00Z'};
+  const cloud=createCloud(settings,async(url,options)=>{calls.push({url,...options});if(url.includes('/auth/'))return Response.json({user:{id:'owner-a'},access_token:'test',expires_at:Date.now()/1000+3600});return Response.json([profile]);});
+  await cloud.signIn('a@example.com','password');assert.deepEqual(await cloud.profile(),profile);
+  assert.match(calls[1].url,/provider_label/);assert.match(calls[1].url,/project_defaults/);assert.match(calls[1].url,/onboarding_completed_at/);
+  await cloud.saveProfile(profile);assert.deepEqual(JSON.parse(calls[2].body),profile);
+});

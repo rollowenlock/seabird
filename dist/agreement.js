@@ -2,6 +2,7 @@ import {stages, deliverableItems} from './model.js';
 
 export function agreementDefinition(p, issued = new Date()) {
   const plan = stages(p), end = plan.at(-1).end;
+  const providerName=p.provider?.displayName||'Provider',typeLabels={individual:'Individual',freelancer:'Freelancer',studio:'Studio',practice:'Practice',company:'Company',other:'Other',unspecified:'Provider'},providerType=p.provider?.providerLabel||typeLabels[p.provider?.organisationType]||'Provider';
   const date = value => new Date(value+'T12:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
   const money = value => new Intl.NumberFormat('en-NZ',{style:'currency',currency:p.currency,minimumFractionDigits:2}).format(value);
   const deposit = Math.round(p.fee*p.deposit/100), balance=p.fee-deposit;
@@ -14,16 +15,16 @@ export function agreementDefinition(p, issued = new Date()) {
   ]);
   const width=499, step=width/plan.length;
   return {
-    info:{title:`${p.title} - Project agreement`,author:'Roll',creator:'Seabird',subject:`Project agreement between Roll and ${p.client}`},
+    info:{title:`${p.title} - Project agreement`,author:providerName,creator:'Seabird',subject:`Project agreement between ${providerName} and ${p.client}`},
     pageSize:'A4',pageMargins:[48,48,48,48],
     defaultStyle:{font:'Roboto',fontSize:10,lineHeight:1.3,color:'#30372e'},
     styles:{section:{fontSize:16,bold:true,margin:[0,20,0,10]},muted:{color:'#72786e',fontSize:9},title:{fontSize:29,bold:true,margin:[0,12,0,10]}},
-    footer:(page,pages)=>({columns:[{text:'Roll / '+p.client,width:'*'},{text:`Seabird  ·  ${page} / ${pages}`,alignment:'right',width:120}],margin:[48,15,48,0],fontSize:8,color:'#72786e'}),
+    footer:(page,pages)=>({columns:[{text:providerName+' / '+p.client,width:'*'},{text:`Seabird  ·  ${page} / ${pages}`,alignment:'right',width:120}],margin:[48,15,48,0],fontSize:8,color:'#72786e'}),
     content:[
-      {columns:[{text:'Roll',fontSize:17,bold:true},{text:'PROJECT AGREEMENT\nPrepared '+issued.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Pacific/Auckland'}),alignment:'right',style:'muted'}]},
+      {columns:[{text:providerName,fontSize:17,bold:true},{text:'PROJECT AGREEMENT\nPrepared '+issued.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Pacific/Auckland'}),alignment:'right',style:'muted'}]},
       {text:p.title,style:'title'},
       paragraph(p.description),
-      {text:[{text:'Freelancer: ',bold:true},'Roll',{text:'     Client: ',bold:true},p.client],margin:[0,2,0,18]},
+      {text:[{text:providerType+': ',bold:true},providerName,{text:'     Client: ',bold:true},p.client],margin:[0,2,0,18]},
       {columns:[{stack:[{text:'PROJECT FEE',style:'muted'},{text:money(p.fee)+' '+p.currency,fontSize:22,margin:[0,4,0,4]},{text:p.tax,style:'muted'}]},
         {stack:[{text:'PROJECT DATES',style:'muted'},{text:date(p.start)+' - '+date(end),margin:[0,6,0,4]},{text:`${p.reviews} review rounds · ${p.reviewDays} working days each`,style:'muted'}]}]},
       section('The plan, in one line'),
@@ -41,17 +42,17 @@ export function agreementDefinition(p, issued = new Date()) {
       section('04 / Payments'),
       {table:{headerRows:1,widths:['*',100,100],body:[[{text:'Payment',bold:true},{text:'Due',bold:true},{text:'Amount',bold:true}],
         [`Deposit (${p.deposit}%) - to book the project`,date(p.start),money(deposit)],
-        [`Balance (${100-p.deposit}%) - before final masters`,date(end),money(balance)]]},layout:'lightHorizontalLines'},
+        [`Balance (${100-p.deposit}%) - before final delivery`,date(end),money(balance)]]},layout:'lightHorizontalLines'},
       {text:p.currency+' · '+p.tax,style:'muted',margin:[0,8,0,10]},paragraph(p.paymentNote),
       section('05 / Working agreement'),paragraph(p.terms),
       {text:'Usage & handover',bold:true,margin:[0,6,0,5]},paragraph(p.rights),
       section('06 / Changes & delays'),paragraph(p.changesPolicy??'No separate changes policy was specified in this version. Please refer to the working agreement.'),
       {pageBreak:'before',stack:[section('Agreement & signatures'),paragraph('By signing below, both parties confirm the scope, specifications, schedule, responsibilities, fee and terms set out in this document.'),
-        {columns:['Roll',p.client].map(party=>({stack:[{text:party,bold:true,margin:[0,8,0,16]},
+        {columns:[providerName,p.client].map(party=>({stack:[{text:party,bold:true,margin:[0,8,0,16]},
           {text:'Signature: __________________________',margin:[0,0,0,16]},
           {text:'Name: ______________________________',margin:[0,0,0,16]},
           {text:'Date: _______________________________',margin:[0,0,0,8]}]})),columnGap:24},
-        {text:'Please sign and return a copy to Roll. This document does not record an electronic signature or a payment.',style:'muted',margin:[0,12,0,0]}]},
+        {text:`Please sign and return a copy to ${providerName}. This document does not record an electronic signature or a payment.`,style:'muted',margin:[0,12,0,0]}]},
     ],
     pageBreakBefore: node => node.style==='section' && node.startPosition?.verticalRatio>0.84,
   };
@@ -82,7 +83,8 @@ export function agreementHtml(p, issued = new Date()) {
     return `<${tag} class="paper-text" ${attr}>${text}</${tag}>`;
   }
   const sheets=[[]];for(const node of doc.content){if(node.pageBreak==='before')sheets.push([]);sheets.at(-1).push(node)}
-  return sheets.map((sheet,i)=>`<article class="agreement-paper" aria-label="${i?'Signature sheet':'Project agreement'}">${sheet.map(render).join('')}<div class="paper-footer"><span>Roll / ${escapeHtml(p.client)}</span><span>Seabird</span></div></article>`).join('');
+  const providerName=p.provider?.displayName||'Provider';
+  return sheets.map((sheet,i)=>`<article class="agreement-paper" aria-label="${i?'Signature sheet':'Project agreement'}">${sheet.map(render).join('')}<div class="paper-footer"><span>${escapeHtml(providerName)} / ${escapeHtml(p.client)}</span><span>Seabird</span></div></article>`).join('');
 }
 
 let library;
