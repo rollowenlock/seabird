@@ -10,7 +10,7 @@ test('the complete timeline fits its card instead of becoming horizontally scrol
   assert.match(css,/\.timeline\{[^}]*width:100%[^}]*min-width:0/);
   assert.doesNotMatch(css,/\.timeline-scroll\{[^}]*overflow-x:auto/);
   assert.doesNotMatch(css,/\.timeline\{[^}]*min-width:670px/);
-  assert.match(app,/--stage-count:\$\{s\.length\}/);
+  assert.match(app,/--stage-count:\$\{plan\.length\}/);
   assert.match(app,/class="today-marker\$\{edge\}\$\{outside\}"/);
   assert.match(css,/\.today-marker\{[^}]*position:absolute[^}]*left:var\(--today\)/);
   assert.match(css,/\.today-marker\.is-before::after,.today-marker\.is-after::after\{display:none\}/);
@@ -29,4 +29,7 @@ test('mobile keeps stage details and forms usable without widening the page',()=
   assert.match(css,/\.onboarding-numbers\{grid-template-columns:1fr\}/);
   assert.match(css,/\.auth-home\{margin-top:7vh;padding:34px 22px\}/);
   assert.match(css,/\.auth-home \.google-signin\{[^}]*color:var\(--ink\)/);
+  assert.match(app,/\$\{timelineMarkup\(s,end,progress\)\}<div class="project-heading">/);
+  assert.match(app,/class="project-actions-menu"/);
+  assert.match(css,/\.project-actions-wide\{display:none\}\.project-actions-menu\{display:block/);
 });
