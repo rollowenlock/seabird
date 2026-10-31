@@ -36,4 +36,8 @@ test('mobile keeps stage details and forms usable without widening the page',()=
   assert.match(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label'\)/);
   assert.match(css,/\.timeline-labels\{display:flex;gap:clamp\(2px,\.5vw,5px\)/);
   assert.match(css,/@media\(max-width:760px\)\{\.timeline-labels\{display:none\}\}/);
+  assert.match(app,/class="progress-more"><summary>More<\/summary>/);
+  assert.match(app,/button\.closest\('details'\)\?\.removeAttribute\('open'\)/);
+  assert.match(css,/\.progress-actions\{display:grid;grid-template-columns:minmax\(0,1fr\) minmax\(0,1fr\) auto/);
+  assert.match(css,/\.project-heading \.intro p\{display:none\}/);
 });
