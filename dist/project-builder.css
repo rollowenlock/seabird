@@ -1,0 +1,41 @@
+.builder-cancel{border-color:transparent;background:transparent;color:var(--muted);font-size:14px}
+main:has(.project-builder){max-width:none;padding-top:48px;background:#faf9f4}
+.project-builder{width:min(760px,100%);margin:0 auto;padding-bottom:70px}
+.builder-eyebrow,.builder-section-label{display:block;margin-bottom:25px;color:#74776f;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+.project-builder h1{max-width:720px;margin-bottom:34px;font-size:clamp(42px,6vw,62px);font-weight:500;letter-spacing:-2.5px}
+.builder-brief-card{position:relative;border:1px solid var(--line);border-radius:14px;background:#fffef9;overflow:hidden}
+.builder-brief-card>label:first-child{margin:27px 30px 7px;color:#777970;font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase}
+.builder-brief-card>textarea{min-height:220px;padding:7px 30px 50px;border:0;border-radius:0;background:transparent;font-size:23px;line-height:1.45;resize:vertical}
+.builder-brief-card>textarea:focus{outline:0;box-shadow:inset 0 0 0 2px #60754f}
+.builder-count{position:absolute;right:29px;top:241px;color:var(--muted);font-size:13px}.builder-count b{font-weight:400}
+.builder-source-actions{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.builder-source-actions button{min-height:70px;border:0;border-radius:0;font-size:15px}.builder-source-actions button+button{border-left:1px solid var(--line)}
+.builder-notes{padding:0 28px 24px}.builder-notes textarea{min-height:105px;margin-top:7px}
+.builder-explainer{margin:28px 0;color:var(--muted);font-size:19px;line-height:1.5}
+.builder-defaults{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:72px;padding:18px 22px;border-radius:12px;background:#eef0e8;font-size:15px}
+.builder-defaults button{border:0;border-left:1px solid #d3d7cd;border-radius:0;padding-left:24px;color:#4e663f;font-weight:650}
+.builder-default-fields{padding:7px 18px 18px;border:1px solid #dfe1d8;border-top:0;border-radius:0 0 12px 12px;background:#f6f6ef}
+.builder-build{width:100%;min-height:74px;margin-top:28px;border-radius:12px;background:#526b43;border-color:#526b43;font-size:21px}
+.builder-private{margin:11px 0 23px;text-align:center;color:var(--muted);font-size:13px}
+.builder-questions{display:block;margin:0 auto;border:0;border-radius:0;padding:5px 0;border-bottom:1px solid #617752;color:#526b43;font-size:15px}
+.builder-status{min-height:24px;margin-top:14px;text-align:center;color:#526b43;font-size:13px}
+.builder-review{width:min(720px,100%)}.builder-review>h1{margin-bottom:15px}.builder-review>.builder-explainer{margin:0 0 30px}
+.builder-review-section{margin-bottom:16px;padding:28px 30px;border:1px solid var(--line);border-radius:14px;background:#fffef9}
+.builder-review-section .builder-section-label{margin-bottom:18px}.builder-review-section label{font-size:12px}.builder-review-section textarea{min-height:100px}
+.builder-review-actions{display:flex;justify-content:space-between;gap:12px;margin-top:24px}.builder-review-actions button{min-height:50px}
+@media(max-width:600px){
+ main:has(.project-builder){padding:27px 18px 38px}
+ body:has(.project-builder) header{border-bottom:0}
+ .project-builder{padding-bottom:35px}.builder-eyebrow{margin-bottom:16px;font-size:10px}
+ .project-builder h1{margin-bottom:21px;font-size:28px;line-height:1.08;letter-spacing:-1px;white-space:nowrap}
+ .builder-brief-card>label:first-child{margin:18px 20px 5px}
+ .builder-brief-card>textarea{min-height:130px;padding:5px 20px 34px;font-size:17px;line-height:1.45}
+ .builder-count{right:19px;top:145px;font-size:11px}
+ .builder-source-actions button{min-height:56px;padding:9px 8px;font-size:12px}
+ .builder-notes{padding:0 18px 19px}.project-builder>.builder-explainer{margin:18px 0;font-size:14px;line-height:1.45}
+ .builder-defaults{min-height:56px;padding:12px 17px;font-size:12px}.builder-defaults button{padding-left:16px}
+ .builder-default-fields{padding:4px 14px 15px}.builder-build{min-height:56px;margin-top:18px;font-size:17px}
+ .builder-private{margin:8px 0 17px;font-size:11px}.builder-questions{font-size:13px}
+ .builder-review h1{font-size:36px;white-space:normal}.builder-review-section{padding:22px 19px}.builder-review-actions{padding:10px 0}
+ .builder-review-actions .primary{flex:1}
+}

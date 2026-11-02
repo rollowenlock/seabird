@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 
-const css=await readFile(new URL('../dist/style.css',import.meta.url),'utf8');
+const css=(await readFile(new URL('../dist/style.css',import.meta.url),'utf8'))+(await readFile(new URL('../dist/mobile-polish.css',import.meta.url),'utf8'))+(await readFile(new URL('../dist/project-builder.css',import.meta.url),'utf8'));
 const app=await readFile(new URL('../dist/app.js',import.meta.url),'utf8');
 
 test('the complete timeline fits its card instead of becoming horizontally scrollable',()=>{
@@ -47,4 +47,19 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.doesNotMatch(app,/class="card-description"/);
   assert.doesNotMatch(app,/class="overview"/);
   assert.match(css,/\.project-card summary,.project-card\[open\] summary\{grid-template-columns:minmax\(105px,.85fr\)/);
+  assert.match(app,/STAGE DETAILS/);
+  assert.match(app,/<span class="closed-label">Details<\/span><span class="open-label">Hide<\/span>/);
+  assert.doesNotMatch(app,/Edit details ↗/);
+  assert.match(css,/--muted:\s*#64675f/);
+  assert.match(css,/\.program-card \.stage-label-compact\s*\{[^}]*font-size:\s*10\.5px/);
+  assert.match(css,/\.project-card \.row-summary\s*\{[^}]*font-size:\s*11px/);
+  assert.match(css,/\.stage-dialog\s*\{[^}]*width:\s*min\(520px, calc\(100% - 28px\)\);[^}]*padding:\s*22px/);
+  assert.match(app,/Start with what you know\./);
+  assert.match(app,/Build my first draft/);
+  assert.match(app,/Check the first guesses\./);
+  assert.match(app,/live working record for the project/);
+  assert.match(app,/Terms of engagement/);
+  assert.match(app,/Create working project/);
+  assert.match(app,/Working project/);
+  assert.match(css,/\.project-builder\{width:min\(760px,100%\)/);
 });

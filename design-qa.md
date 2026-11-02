@@ -1,47 +1,62 @@
-# Seabird compact project view — design QA
+# Project builder design QA
 
-- Source visual truth: `C:\Users\Home\.codex\codex-remote-attachments\01a18660-74ae-7811-ab1a-d9dd44338729\19FCD0A4-06EE-48E7-BB20-E1ADE0928043\1-Photo-1.jpg`
-- Implementation screenshot: `.openai/design-qa/implementation-mobile.png`
-- Side-by-side evidence: `.openai/design-qa/comparison.png`
-- Viewport: 390 × 650 CSS px, device scale factor 1, Pacific/Auckland timezone
-- Source pixels: 590 × 1280. The browser chrome was excluded and the 590px app region was normalized to a 390px comparison width.
-- Implementation pixels: 390 × 650
-- State: collapsed client project snapshot. The owner uses the same shell; private progress actions appear only after expanding Program.
+## Evidence
 
-## Full-view comparison
-
-The implementation preserves the reference palette, type character, thin borders, stage colors, Today marker, and calm project hierarchy while intentionally removing the reference's redundant stage selector, legend, standalone progress card, overview block, and permanent edit action. Project identity, Program, Today, and all six project summaries are visible within 650px without horizontal or vertical overflow.
-
-## Focused-region comparison
-
-The Program and summary-list region required focused review because it carries the density target. Stage labels now use compact `R1`, `R2`, and `Final` forms rather than breaking words. Summary rows retain readable titles, commercial/timing summaries, and explicit View affordances at mobile size.
+- Source visual truth: `C:\Users\Home\.codex\generated_images\01a195d8-8754-7be1-9914-442c7af5be63\exec-c052f328-40be-45ec-a8ce-9f4d0943181d.png`
+- Browser-rendered implementation: `qa/project-builder-brief-mobile.png`
+- Review state: `qa/project-builder-review-mobile.png`
+- Created working-project state: `qa/project-builder-created-mobile.png`
+- Combined full-view comparison: `qa/project-builder-comparison.png`
+- Viewport: 390 x 844 CSS px, device scale factor 1, mobile and touch enabled.
+- Source pixels: 853 x 1844. The source was normalized to 390 px wide, approximately 390 x 843, in the combined comparison.
+- Implementation pixels: 390 x 859 for the complete first screen; the visible browser viewport is 390 x 844.
+- State: project brief filled with the reference content, brief focused, account defaults visible, no settings disclosure open.
 
 ## Findings
 
-No actionable P0, P1, or P2 findings remain.
+- No actionable P0, P1, or P2 differences remain.
+- [P3] The source uses small document, attachment, settings, and arrow icons. The implementation keeps those actions as clear text controls rather than introducing a new icon dependency. This slightly reduces decorative fidelity without changing hierarchy or usability.
+- [P3] The headless QA environment denied the external Google Fonts request. The browser rendered the declared Arial fallback; production can load the existing DM Sans import. There were no JavaScript exceptions or application console errors.
 
-- Typography: DM Sans, weights, hierarchy, and truncation are consistent with the existing product. Mobile summary text was increased after the first comparison.
-- Spacing: the compact rhythm fits all required collapsed information above the fold with clear grouping.
-- Colors: existing Seabird tokens and semantic schedule colors are preserved.
-- Images/assets: this screen contains no required raster imagery or non-standard icons.
-- Copy: every collapsed row carries a job-specific summary; decorative descriptions and numbering were removed.
-- Accessibility: native disclosure controls remain keyboard-accessible, stage buttons retain descriptive labels, and only one project disclosure stays open.
+## Required fidelity surfaces
 
-## Interaction and regression evidence
+- Fonts and typography: hierarchy, weight, line height, letter spacing, wrapping, truncation, and small-label optical weight were checked at 390 px. The post-fix headline remains on one line like the source. The QA capture used the fallback because external font access was denied.
+- Spacing and layout rhythm: the normalized source and implementation now occupy effectively one 390 x 844 screen. Header, headline, brief card, explanation, defaults strip, CTA, reassurance, and alternate route follow the same order and density. Borders, radii, and the restrained flat treatment match the Seabird system.
+- Colors and visual tokens: off-white background, dark ink, muted secondary text, pale account-default panel, fine neutral borders, and restrained green primary action match the selected direction.
+- Image quality and asset fidelity: there is no photographic or illustrative content. No source imagery was replaced with placeholders or generated code art. The remaining source icons are intentionally omitted and recorded as P3.
+- Copy and content: the selected structure is preserved. Product copy was corrected to describe a live working project containing deliverables, programme, payment plan, and engagement terms rather than presenting Seabird as only a proposal generator.
 
-- Timeline-stage click opened the correct stage dialog.
-- Opening a second project disclosure closed the first.
-- Local browser console contained no errors.
-- All 39 automated tests passed, including backend privacy, client snapshot, timeline fit, Today positioning, and responsive-layout coverage.
+## Focused region comparison
+
+A separate crop was not needed. At 390 px the combined comparison keeps every first-screen control and label legible. The longer review and created-project states were captured separately to verify their complete layouts.
+
+## Interaction and console verification
+
+- Filled the project brief.
+- Built the first set of suggestions.
+- Verified prefilled client, deliverable, technical specification, programme, estimate, deposit, payment plan, and engagement terms.
+- Created the working project through the final CTA.
+- Verified the resulting live project screen and working-project status.
+- Console check: one denied external font request from the restricted QA environment; no page exceptions or app errors.
 
 ## Comparison history
 
-1. Initial capture found two P2 legibility issues: 9px summary text was too fine, and narrow Review/Delivery labels broke awkwardly.
-2. Increased summary typography and row height slightly; shortened track-only labels to `R1`, `R2`, and `Final`.
-3. Re-captured at 390 × 650. All six summaries still fit, label breaks are resolved, and no P0/P1/P2 issues remain.
+1. Initial comparison: `qa/project-builder-brief-mobile.png` was 390 x 1019. P2 findings were excessive vertical density on the first screen and a sticky review action bar that covered a field in the full review state.
+2. Fixes: reduced only the mobile builder headline, brief field, explanatory copy, defaults strip, gaps, and CTA height; removed the sticky review action bar.
+3. Post-fix evidence: the first screen is 390 x 859 and matches the normalized source's single-screen composition. `qa/project-builder-review-mobile.png` shows the complete review without obscured fields. No P0, P1, or P2 findings remain.
+
+## Implementation checklist
+
+- [x] Match selected option 3 at the mobile viewport.
+- [x] Use real account defaults and editable first guesses.
+- [x] Include deliverables, programme, engagement terms, and payment plan.
+- [x] Create the project only after explicit review.
+- [x] Verify the complete working-project path in a browser.
+- [x] Run the repository test suite.
 
 ## Follow-up polish
 
-None required for this iteration.
+- Add a small existing-library icon set only if Seabird adopts one elsewhere; do not introduce it for this screen alone.
+- Recheck exact DM Sans rendering in an environment with external font access.
 
 final result: passed

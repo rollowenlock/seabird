@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {newProject,normaliseProjectDefaults} from '../dist/projects.js';
+import {newProject,normaliseProjectDefaults,suggestProjectDraft} from '../dist/projects.js';
 import {clientProject,providerIdentity,stages,validate} from '../dist/model.js';
 const details={title:'  Film titles  ',client:'  Example Studio  ',start:'2026-11-02'};
 test('new projects have unique IDs and blank commercial figures, without fictional sample deliverables',()=>{
@@ -29,4 +29,17 @@ test('new projects copy account defaults without inventing project-specific scop
 test('legacy projects retain their original animation stage fallback',()=>{
   const project=newProject(details);delete project.makingStageName;delete project.stagePlan;delete project.workflow;
   assert.equal(stages(project).find(stage=>stage.key==='animation').name,'Animation');
+});
+
+test('the project builder makes editable first guesses from the brief and account defaults',()=>{
+  const draft=suggestProjectDraft('Opening titles for a documentary series for Northlight Films. Six episodes.',{profile:{work_types:['Film / video'],project_defaults:{currency:'NZD',rate:1000,deposit:50,conceptDays:3,animationDays:6,reviews:2,reviewDays:2,finishDays:2}},now:new Date(2026,10,2)});
+  assert.equal(draft.title,'Opening titles for a documentary series for Northlight Films');
+  assert.equal(draft.client,'Northlight Films');assert.equal(draft.deliverableItems[0].name,'Opening title sequence');
+  assert.match(draft.deliverableItems[0].specs,/requirements to confirm/);
+  assert.equal(draft.days,15);assert.equal(draft.fee,15000);assert.equal(draft.start,'2026-11-02');
+});
+
+test('project builder guesses remain honest when the brief has no client or rate',()=>{
+  const draft=suggestProjectDraft('',{profile:{work_types:['Photography']},now:new Date(2026,10,2)});
+  assert.equal(draft.client,'Client to confirm');assert.equal(draft.fee,0);assert.match(draft.description,/Photography/);
 });

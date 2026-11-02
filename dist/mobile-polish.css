@@ -1,0 +1,173 @@
+:root {
+  --muted: #64675f;
+}
+
+.dialog-head button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #c9cbc3;
+  background: #f6f5f0;
+  font-size: 12px;
+}
+
+.program-progress small {
+  font-size: 10px;
+}
+
+.program-toggle {
+  font-size: 11px;
+}
+
+.row-toggle {
+  min-width: 54px;
+  padding: 5px 8px;
+  border: 1px solid #cfd1c8;
+  border-radius: 20px;
+  background: #f1f1ea;
+  color: #50544c;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .timeline-heading span:last-child {
+    font-size: 11px;
+  }
+
+  .stage-number {
+    font-size: 10px;
+    color: #60645b;
+  }
+
+  .stage-label-compact {
+    font-size: 11px;
+  }
+
+  .row-summary {
+    font-size: 11px;
+  }
+
+  .meta {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .preview-banner {
+    font-size: 11px;
+  }
+
+  .project-heading .status {
+    padding: 5px 9px;
+  }
+
+  .program-card {
+    padding: 10px 11px 0;
+  }
+
+  .program-card .timeline-heading span:last-child {
+    font-size: 10px;
+  }
+
+  .program-card .stage {
+    min-height: 42px;
+  }
+
+  .program-card .stage-number {
+    height: 14px;
+    font-size: 10px;
+  }
+
+  .program-card .stage .bar {
+    height: 8px;
+    margin-bottom: 6px;
+  }
+
+  .program-card .stage-label-compact {
+    font-size: 10.5px;
+    line-height: 1.05;
+  }
+
+  .program-progress > summary,
+  .client-progress {
+    min-height: 48px;
+    padding: 7px 11px;
+  }
+
+  .program-progress small {
+    font-size: 10px;
+  }
+
+  .program-progress strong {
+    font-size: 14px;
+  }
+
+  .program-status-copy {
+    font-size: 11px;
+  }
+
+  .program-actions button {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+
+  .project-card summary,
+  .project-card[open] summary {
+    min-height: 52px;
+    padding-block: 9px;
+  }
+
+  .project-card .row-title {
+    font-size: 14px;
+  }
+
+  .project-card .row-summary {
+    font-size: 11px;
+  }
+
+  .row-toggle {
+    min-width: 52px;
+    padding: 6px 7px;
+    font-size: 10px;
+  }
+
+  .project-card .detail {
+    padding: 13px 11px 15px;
+    font-size: 12px;
+  }
+
+  .detail .payment {
+    padding: 10px 0;
+  }
+
+  .project-card .detail button {
+    min-height: 44px;
+    margin-top: 12px;
+    padding: 9px 12px;
+    font-size: 11px;
+  }
+
+  .stage-dialog {
+    width: min(520px, calc(100% - 28px));
+    padding: 22px;
+  }
+
+  .stage-dialog h2 {
+    margin: 14px 0 18px;
+  }
+
+  .stage-dialog .stage-owner {
+    margin-bottom: 4px;
+  }
+
+  .stage-dialog .hint {
+    margin: 10px 0;
+  }
+
+  .stage-dialog .stage-detail {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+}
