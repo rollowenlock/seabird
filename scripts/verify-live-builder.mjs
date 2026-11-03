@@ -1,6 +1,6 @@
 import{chromium}from'playwright';import{mkdir}from'node:fs/promises';import{spawn}from'node:child_process';import path from'node:path';
-const base='http://127.0.0.1:4318',mock='https://mock.local',artifacts=path.resolve('.artifacts');await mkdir(artifacts,{recursive:true});
-let server=null;try{const response=await fetch(base);if(!response.ok)throw new Error()}catch{server=spawn(process.execPath,['server.js'],{cwd:process.cwd(),stdio:'ignore'});for(let i=0;i<30;i++){await new Promise(resolve=>setTimeout(resolve,100));try{if((await fetch(base)).ok)break}catch{}if(i===29)throw new Error('Local Seabird server did not start.')}}
+const base=process.env.BASE_URL||'http://127.0.0.1:4318',mock='https://mock.local',artifacts=path.resolve('.artifacts');await mkdir(artifacts,{recursive:true});
+let server=null;if(base.startsWith('http://127.0.0.1:'))try{const response=await fetch(base);if(!response.ok)throw new Error()}catch{server=spawn(process.execPath,['server.js'],{cwd:process.cwd(),stdio:'ignore'});for(let i=0;i<30;i++){await new Promise(resolve=>setTimeout(resolve,100));try{if((await fetch(base)).ok)break}catch{}if(i===29)throw new Error('Local Seabird server did not start.')}}
 const browser=await chromium.launch({headless:true,executablePath:'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'});
 const page=await browser.newPage({viewport:{width:1280,height:900},deviceScaleFactor:1});
 const session={access_token:'test-access',refresh_token:'test-refresh',expires_at:4102444800,user:{id:'11111111-1111-4111-8111-111111111111',email:'studio@example.test'}};
