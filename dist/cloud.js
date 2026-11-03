@@ -100,14 +100,20 @@ export function createCloud(settings=config, request=fetch, storage=null) {
       return result[0];
     },
     async proposal(id){
-      const row=(await data('proposals?project_id=eq.'+encodeURIComponent(id)+'&select=*,proposal_versions(*)'))[0];
+      const row=(await data('proposals?project_id=eq.'+encodeURIComponent(id)+'&select=*,proposal_versions(*),project_progress(*)'))[0];
       if(!row)return null;
       row.acceptances=await data('acceptances?proposal_id=eq.'+encodeURIComponent(row.id)+'&order=version.desc');return row;
     },
     publish(id,project,version){return data('rpc/publish_proposal','POST',{project_id:id,project,expected_version:version});},
+    async progress(id){const row=(await data('proposals?project_id=eq.'+encodeURIComponent(id)+'&select=id,project_progress(*),acceptances(version)'))[0];return row??null;},
+    updateProgress(id,revision,progress){return data('rpc/update_project_progress','POST',{project_id:id,expected_revision:revision,progress});},
     manage(id,action){return data('rpc/manage_proposal','POST',{project_id:id,action});},
     read(token){return data('rpc/read_proposal','POST',{link_token:token},true);},
     accept(token,version,name,email,agreed){return data('rpc/accept_proposal','POST',{link_token:token,expected_version:version,client_name:name,client_email:email,agreed},true);},
+    async projectDraft(input){
+      await fresh();const r=await request('/api/project-draft',{method:'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify(input)});
+      const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.error||'AI suggestions are unavailable. Your instant draft is still ready.');return body;
+    },
     async remove(){await data('profiles?user_id=eq.'+session.user.id,'DELETE');},
     async signOut(){try{if(session)await auth('logout?scope=local',{},session.access_token);}finally{persist(null);}}
   };

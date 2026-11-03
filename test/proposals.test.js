@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
-import {clientProject,example,startTracking} from '../dist/model.js';
+import {clientProject,example,startTracking,upgradeProject,publicProgress} from '../dist/model.js';
 
 test('published versions enforce ownership, privacy, stale acceptance and revocation in PostgreSQL',async()=>{
   const db=new PGlite();
@@ -46,7 +46,12 @@ test('published versions enforce ownership, privacy, stale acceptance and revoca
     const v2=await rpc('authenticated',alice,'publish_proposal',[project.id,{...publishable,fee:12345},1]);assert.equal(v2.token,first.token);assert.equal(v2.version,2);
     await assert.rejects(rpc('anon',null,'accept_proposal',[first.token,1,'Client','client@example.test',true]),/changed/);
     await assert.rejects(rpc('authenticated',alice,'publish_proposal',[project.id,publishable,1]),/changed/);
-    assert.equal((await publicRead()).accepted_at,null);
+    const pending=await publicRead();assert.equal(pending.version,1);assert.equal(pending.latest_version,2);assert.equal(pending.pending.version,2);assert.equal(pending.accepted_at,accepted.accepted_at);assert.equal(pending.progress.lifecycle,'active');
+    upgradeProject(project);const progress=publicProgress(project,1);
+    const updated=await rpc('authenticated',alice,'update_project_progress',[project.id,pending.progress_revision,progress]);assert.equal(updated.baseline_version,1);
+    await assert.rejects(rpc('authenticated',bob,'update_project_progress',[project.id,null,progress]));
+    await assert.rejects(rpc('authenticated',alice,'update_project_progress',[project.id,null,progress]),/changed elsewhere/);
+    await rpc('authenticated',alice,'update_project_progress',[project.id,updated.revision,{...progress,privateNotes:['never expose']}]);const progressed=await publicRead();assert.equal(progressed.progress.lifecycle,'active');assert.doesNotMatch(JSON.stringify(progressed),/never expose/);
     const history=await as('authenticated',alice,'select * from seabird.acceptances');assert.equal(history.length,1);assert.equal(history[0].name,'Client');
     assert.equal((await as('authenticated',bob,'select * from seabird.acceptances')).length,0);
     await rpc('authenticated',alice,'manage_proposal',[project.id,'revoke']);assert.equal(await publicRead(),null);

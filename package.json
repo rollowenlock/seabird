@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check dist/app.js && node --check dist/cloud.js && node --check dist/sharing.js && node --test test/*.test.js",
+    "test": "node --check dist/app.js && node --check dist/cloud.js && node --check dist/sharing.js && node --check api/project-draft.js && node --check server.js && node --test test/*.test.js",
     "dev": "node server.js"
   },
   "devDependencies": {
