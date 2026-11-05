@@ -63,5 +63,8 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/Terms of engagement/);
   assert.match(app,/Start this project/);
   assert.match(app,/Draft saved/);
+  assert.match(app,/function refreshBuilderPreview\(\)/);
+  assert.match(app,/await workspace\.save\(\);if\(JSON\.stringify\(projectBuilder\.draft\)!==draftVersion\)return/);
+  assert.doesNotMatch(app,/applyDraftToProject\(projectBuilder\.project,d\);save\(\);await workspace\.save\(\)/);
   assert.match(css,/\.builder-document\{/);
 });
