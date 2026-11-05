@@ -62,6 +62,10 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(css,/\.builder-setup-pane\.is-mobile-hidden,.builder-preview-pane\.is-mobile-hidden\{display:none\}/);
   assert.match(app,/Terms of engagement/);
   assert.match(app,/Start this project/);
+  assert.match(app,/data-action="edit-project">Edit project/);
+  assert.match(app,/Edit the project as it changes\./);
+  assert.match(app,/Accepted client versions stay unchanged until you publish a new version\./);
+  assert.match(app,/Done editing/);
   assert.match(app,/Draft saved/);
   assert.match(app,/function refreshBuilderPreview\(\)/);
   assert.match(app,/await workspace\.save\(\);if\(JSON\.stringify\(projectBuilder\.draft\)!==draftVersion\)return/);
