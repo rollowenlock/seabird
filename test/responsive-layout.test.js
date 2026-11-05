@@ -12,9 +12,11 @@ test('the complete timeline fits its card instead of becoming horizontally scrol
   assert.doesNotMatch(css,/\.timeline\{[^}]*min-width:670px/);
   assert.match(app,/--stage-count:\$\{plan\.length\}/);
   assert.match(app,/class="today-marker\$\{edge\}\$\{outside\}"/);
-  assert.match(app,/class="timeline-before"/);
+  assert.match(app,/class="timeline-lead"/);
   assert.match(app,/Today, \$\{date\(today\)\}, is \$\{days\} day/);
-  assert.match(css,/\.timeline-before i\{[^}]*border-top:1px dashed/);
+  assert.match(css,/\.timeline-lead \.bar\{[^}]*repeating-linear-gradient/);
+  assert.doesNotMatch(app,/class="timeline-before"/);
+  assert.doesNotMatch(css,/\.timeline-before/);
   assert.match(css,/\.today-marker\{[^}]*position:absolute[^}]*left:var\(--today\)/);
   assert.match(css,/\.today-marker\.is-before::after,.today-marker\.is-after::after\{display:none\}/);
 });
@@ -35,7 +37,7 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/class="project-actions-menu"/);
   assert.match(css,/\.project-actions-wide\{display:none\}\.project-actions-menu\{display:block/);
   assert.match(app,/class="timeline-labels" aria-hidden="true"/);
-  assert.match(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label'\)/);
+  assert.match(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label:not\(\.timeline-lead-label\)'\)/);
   assert.match(css,/\.timeline-labels\{display:flex;gap:clamp\(2px,\.5vw,5px\)/);
   assert.match(css,/@media\(max-width:760px\)\{\.timeline-labels\{display:none\}\}/);
   assert.match(app,/class="program-progress is-\$\{status\.state\}/);
