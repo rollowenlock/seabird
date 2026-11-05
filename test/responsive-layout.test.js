@@ -77,3 +77,15 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.doesNotMatch(app,/applyDraftToProject\(projectBuilder\.project,d\);save\(\);await workspace\.save\(\)/);
   assert.match(css,/\.builder-document\{/);
 });
+
+test('the projects home is a shared portfolio timeline instead of a card grid',()=>{
+  assert.match(app,/function portfolioModel\(items\)/);
+  assert.match(app,/class="portfolio-timeline"/);
+  assert.match(app,/class="portfolio-project is-\$\{esc\(item\.lifecycle\)\}/);
+  assert.match(app,/Every project on the same timeline\. Overlaps show where the work is busiest\./);
+  assert.match(css,/\.portfolio-project\{[^}]*display:grid[^}]*width:100%/);
+  assert.match(css,/\.portfolio-gridlines b\{[^}]*left:var\(--today\)/);
+  assert.match(css,/@media\(max-width:600px\)[\s\S]*\.portfolio-timeline\{--project-label:112px/);
+  assert.doesNotMatch(app,/class="project-grid"/);
+  assert.doesNotMatch(app,/class="project-tile"/);
+});
