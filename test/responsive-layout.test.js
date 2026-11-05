@@ -12,6 +12,9 @@ test('the complete timeline fits its card instead of becoming horizontally scrol
   assert.doesNotMatch(css,/\.timeline\{[^}]*min-width:670px/);
   assert.match(app,/--stage-count:\$\{plan\.length\}/);
   assert.match(app,/class="today-marker\$\{edge\}\$\{outside\}"/);
+  assert.match(app,/class="timeline-before"/);
+  assert.match(app,/Today, \$\{date\(today\)\}, is \$\{days\} day/);
+  assert.match(css,/\.timeline-before i\{[^}]*border-top:1px dashed/);
   assert.match(css,/\.today-marker\{[^}]*position:absolute[^}]*left:var\(--today\)/);
   assert.match(css,/\.today-marker\.is-before::after,.today-marker\.is-after::after\{display:none\}/);
 });
