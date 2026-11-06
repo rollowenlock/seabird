@@ -72,6 +72,14 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/Accepted client versions stay unchanged until you publish a new version\./);
   assert.match(app,/Done editing/);
   assert.match(app,/Draft saved/);
+  assert.match(app,/function programmeIsTracked\(project\)/);
+  assert.match(app,/class="builder-live-programme"/);
+  assert.match(app,/Actual project programme/);
+  assert.match(app,/data-builder="change-programme"/);
+  assert.match(app,/class="builder-cancel" data-builder="builder-cancel"/);
+  assert.match(app,/preserveProgramme:projectBuilder\.programmeLocked/);
+  assert.match(app,/if\(locked\)\{d\.start=start;d\.programme=programme\}/);
+  assert.match(css,/\.builder-programme-preview\{/);
   assert.match(app,/function refreshBuilderPreview\(\)/);
   assert.match(app,/await workspace\.save\(\);if\(JSON\.stringify\(projectBuilder\.draft\)!==draftVersion\)return/);
   assert.doesNotMatch(app,/applyDraftToProject\(projectBuilder\.project,d\);save\(\);await workspace\.save\(\)/);
