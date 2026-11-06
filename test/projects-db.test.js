@@ -23,7 +23,8 @@ test('project rows migrate existing drafts and enforce owner isolation with revi
       insert into auth.users values('${alice}'),('${bob}');`);
     const dir=new URL('../cookham/supabase/migrations/',import.meta.url);
     const files=(await readdir(dir)).filter(file=>file.endsWith('.sql')).sort();
-    for(const file of files.filter(file=>!file.includes('add_project_records')))await db.exec(await readFile(new URL(file,dir),'utf8'));
+    const deferred=files.filter(file=>file.includes('add_project_records')||file.includes('delete_project_record'));
+    for(const file of files.filter(file=>!deferred.includes(file)))await db.exec(await readFile(new URL(file,dir),'utf8'));
     for(const id of [alice,bob])await as('authenticated',id,'insert into seabird.profiles(user_id) values($1)',[id]);
     const profile=(await as('authenticated',alice,"update seabird.profiles set display_name='Northlight Films',organisation_type='studio',work_types=array['Motion design','Animation'] where user_id=$1 returning display_name,organisation_type,work_types",[alice]))[0];
     assert.equal(profile.display_name,'Northlight Films');assert.equal(profile.organisation_type,'studio');assert.deepEqual(profile.work_types,['Motion design','Animation']);
@@ -38,6 +39,7 @@ test('project rows migrate existing drafts and enforce owner isolation with revi
     const legacy={...example(),id:'legacy-project',title:'Existing workspace project'};
     await as('authenticated',alice,'insert into seabird.workspaces(user_id,projects) values($1,$2)',[alice,JSON.stringify([legacy])]);
     await db.exec(await readFile(new URL(files.find(file=>file.includes('add_project_records')),dir),'utf8'));
+    await db.exec(await readFile(new URL(files.find(file=>file.includes('delete_project_record')),dir),'utf8'));
 
     const migrated=await as('authenticated',alice,'select id,project,revision from seabird.projects');
     assert.equal(migrated.length,1);assert.equal(migrated[0].id,legacy.id);assert.equal(migrated[0].project.title,legacy.title);assert.equal(Number(migrated[0].revision),1);

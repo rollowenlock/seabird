@@ -94,11 +94,7 @@ export function createCloud(settings=config, request=fetch, storage=null) {
       if(result.length!==1)throw new Error('This project changed elsewhere. Refresh to get the latest version.');
       return result[0];
     },
-    async deleteProject(id,revision){
-      const result=await data('projects?id=eq.'+encodeURIComponent(id)+'&revision=eq.'+revision,'DELETE');
-      if(result.length!==1)throw new Error('This project changed in the cloud. Load it before deleting.');
-      return result[0];
-    },
+    deleteProject(id,revision){return data('rpc/delete_project_record','POST',{project_id:id,expected_revision:revision});},
     async proposal(id){
       const row=(await data('proposals?project_id=eq.'+encodeURIComponent(id)+'&select=*,proposal_versions(*),project_progress(*)'))[0];
       if(!row)return null;
@@ -190,7 +186,7 @@ export function mountCloud({getProjects,setProjects,setAccount,setProfile=()=>{}
   async function updateProfile(patch,file){
     return run(async()=>{let logoPath=currentProfile?.logo_path||null;if(file)logoPath=await cloud.uploadLogo(file);const profile=await cloud.saveProfile({...patch,...(file?{logo_path:logoPath}:{})});showProfile(profile);status.textContent='Settings saved.';return profile;},true);
   }
-  const controller={cloud,get profile(){return currentProfile;},changed,focus(){panel.open=true;(signedIn.hidden?authForm:profileForm).querySelector('input').focus();},signInWithGoogle(){location.assign(cloud.googleAuthorizeUrl(location.origin+location.pathname));},updateProfile,async save(){
+  const controller={cloud,get profile(){return currentProfile;},changed,focus(){panel.open=true;(signedIn.hidden?authForm:profileForm).querySelector('input').focus();},signInWithGoogle(){location.assign(cloud.googleAuthorizeUrl(location.origin+location.pathname));},updateProfile,async deleteProject(id){await flush(false);const row=rows.get(id);if(!row)throw new Error('This project is not available in the cloud.');await cloud.deleteProject(id,row.revision);rows.delete(id);baseline.delete(id);return true;},async save(){
     return flush(false);
   }};
   panel.querySelector('[data-cloud="close"]').addEventListener('click',()=>{panel.open=false;});

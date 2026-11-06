@@ -66,6 +66,17 @@ test('new project rows carry the signed-in owner and stable project ID',async()=
   assert.equal(row.revision,1);assert.match(calls[1].url,/rest\/v1\/projects$/);
   assert.deepEqual(JSON.parse(calls[1].body),{user_id:'owner-a',id:'project-a',project:{id:'project-a'}});
 });
+test('project deletion uses the owner-checked revision RPC',async()=>{
+  const calls=[];
+  const cloud=createCloud(settings,async(url,options)=>{
+    calls.push({url,...options});
+    if(url.includes('/auth/'))return Response.json({user:{id:'owner-a'},access_token:'test',expires_at:Date.now()/1000+3600});
+    return Response.json({ok:true,project_id:'project-a'});
+  });
+  await cloud.signIn('a@example.com','password');await cloud.deleteProject('project-a',7);
+  assert.match(calls[1].url,/rest\/v1\/rpc\/delete_project_record$/);assert.equal(calls[1].method,'POST');
+  assert.deepEqual(JSON.parse(calls[1].body),{project_id:'project-a',expected_revision:7});
+});
 test('cloud deletion targets own app membership only',async()=>{
   const calls=[];
   const cloud=createCloud(settings,async(url,options)=>{

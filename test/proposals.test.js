@@ -26,6 +26,7 @@ test('published versions enforce ownership, privacy, stale acceptance and revoca
     for(const f of (await readdir(dir)).filter(f=>f.endsWith('.sql')).sort())await db.exec(await readFile(new URL(f,dir),'utf8'));
     for(const id of [alice,bob])await as('authenticated',id,'insert into seabird.profiles(user_id) values($1)',[id]);
     const project=example();project.privateNote='never publish this';startTracking(project,{timeZone:'Pacific/Auckland',today:'2026-11-02'});
+    await as('authenticated',alice,'insert into seabird.projects(user_id,id,project) values($1,$2,$3)',[alice,project.id,JSON.stringify(project)]);
     project.workflow.states.kickoff.waiting={since:'2026-11-02',party:'client',reason:'private reason'};
     const publishable=clientProject(project),first=await rpc('authenticated',alice,'publish_proposal',[project.id,publishable,0]);
     assert.equal(first.version,1);
@@ -58,6 +59,10 @@ test('published versions enforce ownership, privacy, stale acceptance and revoca
     await assert.rejects(rpc('anon',null,'accept_proposal',[first.token,2,'Client','client@example.test',true]));
     await rpc('authenticated',alice,'manage_proposal',[project.id,'replace']);assert.equal(await publicRead(),null);
     assert.equal((await as('authenticated',alice,'select * from seabird.acceptances')).length,1);
+    await assert.rejects(rpc('authenticated',bob,'delete_project_record',[project.id,1]));
+    await assert.rejects(rpc('authenticated',alice,'delete_project_record',[project.id,2]),/changed elsewhere/);
+    const deleted=await rpc('authenticated',alice,'delete_project_record',[project.id,1]);assert.equal(deleted.project_id,project.id);
+    for(const table of ['projects','proposals','proposal_versions','acceptances','project_progress'])assert.equal((await db.query(`select * from seabird.${table}`)).rows.length,0);
     await as('authenticated',alice,'delete from seabird.profiles where user_id=$1',[alice]);
     assert.equal((await db.query('select * from seabird.proposal_versions')).rows.length,0);
     assert.equal((await db.query('select * from auth.users')).rows.length,2);
