@@ -97,3 +97,12 @@ test('the projects home is a shared portfolio timeline instead of a card grid',(
   assert.doesNotMatch(app,/class="project-grid"/);
   assert.doesNotMatch(app,/class="project-tile"/);
 });
+
+test('visible timelines refresh when the calendar day changes without interrupting the builder',()=>{
+  assert.match(app,/function dateSignature\(\)/);
+  assert.match(app,/function refreshForDateChange\(\)\{if\(document\.visibilityState==='hidden'\|\|view==='builder'/);
+  assert.match(app,/window\.addEventListener\('focus',refreshForDateChange\)/);
+  assert.match(app,/window\.addEventListener\('pageshow',refreshForDateChange\)/);
+  assert.match(app,/document\.addEventListener\('visibilitychange',refreshForDateChange\)/);
+  assert.match(app,/setInterval\(refreshForDateChange,60000\)/);
+});
