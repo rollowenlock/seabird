@@ -81,3 +81,9 @@ Apply migrations through Cookham’s pinned per-app ledger before releasing the 
 Production-only public environment variables generate `dist/backend-config.js`; previews and
 local development default to cloud-disabled. Vercel installs with `npm ci`, runs tests and
 builds the public configuration. Stage a production build, verify it, then promote it.
+
+Project setup uses a private owner conversation that updates the live project record through
+Vercel AI Gateway. Set `AI_GATEWAY_PROJECT_CHAT_MODEL` to a current structured-output model;
+the default is `openai/gpt-6-luna`. `AI_GATEWAY_PROJECT_DRAFT_MODEL` remains a compatible
+fallback for existing deployments. Conversation history is owner-only and excluded from client
+links, proposals and agreements.
