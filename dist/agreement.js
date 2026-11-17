@@ -13,7 +13,6 @@ export function agreementDefinition(p, issued = new Date()) {
     {stack:[{text:s.name,bold:true},{text:s.owner,fontSize:9,color:'#697063',margin:[0,3,0,0]}]},
     {text:date(s.start)+(s.end===s.start?'':' - '+date(s.end)),fontSize:9},
   ]);
-  const width=499, step=width/plan.length;
   return {
     info:{title:`${p.title} - Project agreement`,author:providerName,creator:'Seabird',subject:`Project agreement between ${providerName} and ${p.client}`},
     pageSize:'A4',pageMargins:[48,48,48,48],
@@ -27,13 +26,9 @@ export function agreementDefinition(p, issued = new Date()) {
       {text:[{text:providerType+': ',bold:true},providerName,{text:'     Client: ',bold:true},p.client],margin:[0,2,0,18]},
       {columns:[{stack:[{text:'PROJECT FEE',style:'muted'},{text:money(p.fee)+' '+p.currency,fontSize:22,margin:[0,4,0,4]},{text:p.tax,style:'muted'}]},
         {stack:[{text:'PROJECT DATES',style:'muted'},{text:date(p.start)+' - '+date(end),margin:[0,6,0,4]},{text:`${p.reviews} review rounds · ${p.reviewDays} working days each`,style:'muted'}]}]},
-      section('The plan, in one line'),
-      {canvas:plan.map((s,i)=>({type:'rect',x:i*step,y:0,w:step-3,h:10,r:2,color:s.color})),margin:[0,0,0,5]},
-      {columns:plan.map((s,i)=>({stack:[{text:String(i+1).padStart(2,'0'),fontSize:8},...(plan.length<=8?[{text:s.name,fontSize:7,margin:[0,3,0,0]},{text:date(s.start),fontSize:7,margin:[0,2,0,0]}]:[])],width:step,color:'#72786e'})),columnGap:0,margin:[0,0,0,12]},
-      {text:'The numbered moments above match the complete schedule below.',style:'muted'},
       section('01 / Deliverables'),
       ...deliverableItems(p).flatMap(item=>[{text:item.name,bold:true,margin:[0,8,0,4]},paragraph(item.specs||'Technical specifications to be agreed.')]),
-      section('02 / Reviews & timing'),
+      section('02 / Programme, reviews & timing'),
       paragraph(`${p.reviews} review rounds, with ${p.reviewDays} working days for each. Send one consolidated set of feedback per round. Working days are Monday-Friday; public holidays are not excluded.`),
       {table:{headerRows:1,dontBreakRows:true,widths:[22,'*',150],body:[[{text:'#',bold:true},{text:'Stage / responsibility',bold:true},{text:'Dates',bold:true}],...rows]},layout:'lightHorizontalLines'},
       ...plan.flatMap((s,i)=>[{text:`${String(i+1).padStart(2,'0')} / ${s.name} - ${s.owner}`,bold:true,margin:[0,14,0,5]},paragraph(s.body)]),

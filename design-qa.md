@@ -1,62 +1,57 @@
-# Project builder design QA
+# Project overview and agreement design QA
 
 ## Evidence
 
-- Source visual truth: `C:\Users\Home\.codex\generated_images\01a195d8-8754-7be1-9914-442c7af5be63\exec-c052f328-40be-45ec-a8ce-9f4d0943181d.png`
-- Browser-rendered implementation: `qa/project-builder-brief-mobile.png`
-- Review state: `qa/project-builder-review-mobile.png`
-- Created working-project state: `qa/project-builder-created-mobile.png`
-- Combined full-view comparison: `qa/project-builder-comparison.png`
-- Viewport: 390 x 844 CSS px, device scale factor 1, mobile and touch enabled.
-- Source pixels: 853 x 1844. The source was normalized to 390 px wide, approximately 390 x 843, in the combined comparison.
-- Implementation pixels: 390 x 859 for the complete first screen; the visible browser viewport is 390 x 844.
-- State: project brief filled with the reference content, brief focused, account defaults visible, no settings disclosure open.
+- Source visual truth: `C:\Users\Home\.codex\attachments\31b71492-a623-4724-b988-9d04c9217087\Screenshot 2026-11-18 at 12.34.41.png` (1183 x 245) and `C:\Users\Home\.codex\attachments\3ea7b992-ec96-442c-9f3c-2278e237cd40\Screenshot 2026-11-18 at 12.36.41.png` (776 x 274).
+- Browser-rendered implementation: `.artifacts/project-overview-rich-rows.png` (1185 x 825), `.artifacts/project-overview-rich-rows-mobile.png` (390 x 844), and `.artifacts/agreement-without-strip.png` (1185 x 3385).
+- Viewports: 1185 x 800 desktop and 390 x 844 mobile, device scale factor 1.
+- State: read-only project view with realistic Wellington Paranormal scope, programme, inputs, fee, payment wording, terms, and change policy; agreement opened from that project.
+- Density normalization: the overview source and desktop implementation use effectively the same 1183/1185 px width. The agreement comparison focuses on the same first-page region rather than browser chrome.
 
 ## Findings
 
 - No actionable P0, P1, or P2 differences remain.
-- [P3] The source uses small document, attachment, settings, and arrow icons. The implementation keeps those actions as clear text controls rather than introducing a new icon dependency. This slightly reduces decorative fidelity without changing hierarchy or usability.
-- [P3] The headless QA environment denied the external Google Fonts request. The browser rendered the declared Arial fallback; production can load the existing DM Sans import. There were no JavaScript exceptions or application console errors.
+- The formerly empty overview rows now expose one restrained line of project-specific information while preserving status and the Details affordance.
+- The agreement no longer repeats the programme as an unlabeled coloured strip. Its named, dated schedule table is now the single programme representation and is headed `Programme, reviews & timing`.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: hierarchy, weight, line height, letter spacing, wrapping, truncation, and small-label optical weight were checked at 390 px. The post-fix headline remains on one line like the source. The QA capture used the fallback because external font access was denied.
-- Spacing and layout rhythm: the normalized source and implementation now occupy effectively one 390 x 844 screen. Header, headline, brief card, explanation, defaults strip, CTA, reassurance, and alternate route follow the same order and density. Borders, radii, and the restrained flat treatment match the Seabird system.
-- Colors and visual tokens: off-white background, dark ink, muted secondary text, pale account-default panel, fine neutral borders, and restrained green primary action match the selected direction.
-- Image quality and asset fidelity: there is no photographic or illustrative content. No source imagery was replaced with placeholders or generated code art. The remaining source icons are intentionally omitted and recorded as P3.
-- Copy and content: the selected structure is preserved. Product copy was corrected to describe a live working project containing deliverables, programme, payment plan, and engagement terms rather than presenting Seabird as only a proposal generator.
+- Fonts and typography: the existing DM Sans hierarchy, weights, line heights, and muted secondary text are preserved. The new preview is smaller than the section title and truncates cleanly at one line.
+- Spacing and layout rhythm: desktop rows increase from 50 px to 68 px and mobile rows to 58 px, enough for useful context without turning them into cards. Two-column alignment and Details controls remain stable.
+- Colors and visual tokens: the existing off-white paper, dark ink, neutral rules, muted copy, green programme bars, and restrained controls are unchanged.
+- Image quality and asset fidelity: these screens contain no photographic, illustrative, logo, or non-standard icon assets. No placeholders or code-drawn replacement assets were introduced.
+- Copy and content: every preview comes from the live project record. Deliverables, review stages, client inputs, payment wording, terms, change policy, and private notes do not invent new commitments.
 
 ## Focused region comparison
 
-A separate crop was not needed. At 390 px the combined comparison keeps every first-screen control and label legible. The longer review and created-project states were captured separately to verify their complete layouts.
+- Overview rows: compared at approximately 1185 px wide. The original title-only rows are replaced by a title plus project-specific preview, while existing right-aligned factual status remains visible.
+- Agreement programme: compared the original coloured strip with the revised first agreement page. The redundant strip and numbered-moments explanation are removed; the full named schedule table remains immediately under the programme heading.
+- Mobile: checked at 390 x 844. Preview, status, and Details remain on one row without horizontal overflow.
 
 ## Interaction and console verification
 
-- Filled the project brief.
-- Built the first set of suggestions.
-- Verified prefilled client, deliverable, technical specification, programme, estimate, deposit, payment plan, and engagement terms.
-- Created the working project through the final CTA.
-- Verified the resulting live project screen and working-project status.
-- Console check: one denied external font request from the restricted QA environment; no page exceptions or app errors.
+- Loaded a read-only project snapshot.
+- Verified the responsive overview at desktop and mobile widths.
+- Opened Agreement from the project view and verified the complete agreement render.
+- The browser journey completed without page exceptions or blocked interactions.
 
 ## Comparison history
 
-1. Initial comparison: `qa/project-builder-brief-mobile.png` was 390 x 1019. P2 findings were excessive vertical density on the first screen and a sticky review action bar that covered a field in the full review state.
-2. Fixes: reduced only the mobile builder headline, brief field, explanatory copy, defaults strip, gaps, and CTA height; removed the sticky review action bar.
-3. Post-fix evidence: the first screen is 390 x 859 and matches the normalized source's single-screen composition. `qa/project-builder-review-mobile.png` shows the complete review without obscured fields. No P0, P1, or P2 findings remain.
+1. Initial source: project sections showed titles and sparse status only; the agreement showed an unlabeled coloured timeline strip.
+2. Fixes: added one-line project-derived previews to overview rows; removed the agreement strip; renamed the schedule section to `Programme, reviews & timing`.
+3. Post-fix evidence: desktop, mobile, and agreement captures show useful context, stable alignment, and a single meaningful schedule representation.
 
 ## Implementation checklist
 
-- [x] Match selected option 3 at the mobile viewport.
-- [x] Use real account defaults and editable first guesses.
-- [x] Include deliverables, programme, engagement terms, and payment plan.
-- [x] Create the project only after explicit review.
-- [x] Verify the complete working-project path in a browser.
-- [x] Run the repository test suite.
+- [x] Add useful project-specific previews without new data fields.
+- [x] Preserve status, progressive disclosure, and client/private boundaries.
+- [x] Keep the mobile view compact and free of horizontal overflow.
+- [x] Remove the redundant agreement timeline strip.
+- [x] Retain the complete named, dated schedule in the agreement.
+- [x] Run the complete test suite.
 
 ## Follow-up polish
 
-- Add a small existing-library icon set only if Seabird adopts one elsewhere; do not introduce it for this screen alone.
-- Recheck exact DM Sans rendering in an environment with external font access.
+- None required for this pass.
 
 final result: passed

@@ -5,7 +5,8 @@ test('web agreement renders all sections safely without an embedded PDF',()=>{
  const p=example();p.title='<script>alert(1)</script>';
  const html=agreementHtml(p);
  assert.ok(html.includes('&lt;script&gt;'));assert.ok(!html.includes('<script>'));assert.ok(!html.includes('<iframe'));
- for(const label of ['Deliverables','Reviews &amp; timing','Client materials','Payments','Working agreement','Changes &amp; delays','Signature:'])assert.ok(html.includes(label),label);
+ for(const label of ['Deliverables','Programme, reviews &amp; timing','Client materials','Payments','Working agreement','Changes &amp; delays','Signature:'])assert.ok(html.includes(label),label);
+ assert.ok(!html.includes('The plan, in one line'));assert.ok(!html.includes('numbered moments'));
 });
 import {example,stages} from '../dist/model.js';
 
