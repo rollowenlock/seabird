@@ -19,7 +19,7 @@ export default async function handler(req,res){
   if(!authorization.startsWith('Bearer ')||!supabaseUrl||!publishableKey)return res.status(401).json({error:'Sign in to use AI suggestions.'});
   const userResponse=await fetch(`${supabaseUrl}/auth/v1/user`,{headers:{Authorization:authorization,apikey:publishableKey}}).catch(()=>null);
   if(!userResponse?.ok)return res.status(401).json({error:'Your sign-in expired. Sign in again.'});
-  const gatewayToken=process.env.VERCEL_OIDC_TOKEN||process.env.AI_GATEWAY_API_KEY;
+  const gatewayToken=req.headers['x-vercel-oidc-token']||process.env.VERCEL_OIDC_TOKEN||process.env.AI_GATEWAY_API_KEY;
   if(!gatewayToken)return res.status(503).json({error:'AI suggestions are not configured. Your instant draft is still ready.'});
   const {brief='',notes='',defaults={},profile={},current={},messages=[]}=req.body;
   const conversation=messages.map(message=>`${message.role==='user'?'PROJECT OWNER':'SEABIRD'}: ${text(message.text)}`).join('\n');
