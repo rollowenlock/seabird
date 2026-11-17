@@ -37,8 +37,15 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/class="project-actions-menu"/);
   assert.match(css,/\.project-actions-wide\{display:none\}\.project-actions-menu\{display:block/);
   assert.match(app,/class="timeline-labels" aria-hidden="true"/);
+  assert.match(app,/function majorStageLabel\(stage\)/);
+  assert.match(app,/function projectSummary\(value,max=180\)/);
+  assert.match(app,/class="project-summary"/);
+  assert.match(app,/pauseStageName\(v\.name\)\?' is-pause'/);
   assert.match(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label:not\(\.timeline-lead-label\)'\)/);
   assert.match(css,/\.timeline-labels\{display:flex;gap:clamp\(2px,\.5vw,5px\)/);
+  assert.match(css,/\.timeline-label\.is-minor\{visibility:hidden\}/);
+  assert.match(css,/\.stage\.is-pause \.bar\{background:transparent;border-top:1px dashed/);
+  assert.match(css,/\.project-heading \.intro \.project-summary\{max-width:780px/);
   assert.match(css,/@media\(max-width:760px\)\{\.timeline-labels\{display:none\}\}/);
   assert.match(app,/class="program-progress is-\$\{status\.state\}/);
   assert.match(app,/class="program-actions"/);
