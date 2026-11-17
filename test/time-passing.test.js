@@ -29,7 +29,22 @@ test('tracking setup records prior stages without invented actual dates',()=>{
   assert.equal(project.workflow.states['review-1'].status,'incomplete');
   assert.equal(currentStageStatus(project,'2026-11-09').current.key,'review-1');
   assert.deepEqual(project.workflow.plan.map(stage=>stage.key),plan.map(stage=>stage.key));
-  assert.throws(()=>refreshUnstartedPlan(project),/Change plan/);
+  refreshUnstartedPlan(project);
+  assert.ok(Object.values(project.workflow.states).every(state=>state.status==='incomplete'));
+});
+
+test('tracking honours a recommended exact schedule including planned pauses',()=>{
+  const project=example();project.stagePlan=[
+    {key:'kickoff',name:'Kick-off',owner:'Together',start:'2026-12-01',end:'2026-12-01'},
+    {key:'direction',name:'Creative direction',owner:'Studio',start:'2026-12-01',end:'2026-12-14'},
+    {key:'production',name:'Production',owner:'Studio',start:'2027-01-06',end:'2027-02-12'},
+    {key:'final-delivery',name:'Final delivery',owner:'Studio',start:'2027-02-22',end:'2027-02-26'}
+  ];
+  startTracking(project,{currentStageKey:'direction',timeZone:'Pacific/Auckland',today:'2026-12-02'});
+  assert.deepEqual(project.workflow.plan,project.stagePlan);
+  assert.equal(project.workflow.plan[2].start,'2027-01-06');
+  refreshUnstartedPlan(project);
+  assert.deepEqual(project.workflow.plan,project.stagePlan);
 });
 
 test('tracking rejects invalid timezones and overlapping or duplicate plans',()=>{

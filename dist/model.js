@@ -63,11 +63,11 @@ function appendActivity(workflow,item){if(workflow.activity.length>=500)throw ne
 function firstIncomplete(p){return stages(p).find(stage=>!['complete','complete-before-tracking'].includes(p.workflow?.states?.[stage.key]?.status));}
 
 export function startTracking(p,{currentStageKey='kickoff',timeZone=Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',today=todayInTimeZone(timeZone)}={}){
-  if(!validTimeZone(timeZone)||!isoDate(today))throw new Error('Choose a valid timezone and tracking date.');const plan=generatedStages(p).map(publicStage),index=plan.findIndex(stage=>stage.key===currentStageKey);if(index<0)throw new Error('Choose a valid current stage.');
+  if(!validTimeZone(timeZone)||!isoDate(today))throw new Error('Choose a valid timezone and tracking date.');const plan=stages(p).map(publicStage),index=plan.findIndex(stage=>stage.key===currentStageKey);if(index<0)throw new Error('Choose a valid current stage.');
   const states=Object.fromEntries(plan.map((stage,i)=>[stage.key,{status:i<index?'complete-before-tracking':'incomplete'}]));
   p.workflow={version:2,timeZone,startedAt:new Date().toISOString(),plan,states,activity:[]};appendActivity(p.workflow,activity('tracking_started',today,{stageKey:currentStageKey}));return p.workflow;
 }
-export function refreshUnstartedPlan(p){if(!p.workflow)return;if(p.workflow.activity.some(item=>item.type!=='tracking_started')||Object.values(p.workflow.states).some(state=>state.status!=='incomplete'))throw new Error('Use Change plan after progress has been recorded.');p.workflow.plan=generatedStages(p).map(publicStage);p.workflow.states=Object.fromEntries(p.workflow.plan.map(stage=>[stage.key,{status:'incomplete'}]));}
+export function refreshUnstartedPlan(p){if(!p.workflow)return;if(p.workflow.activity.some(item=>item.type!=='tracking_started')||Object.values(p.workflow.states).some(state=>!['incomplete','complete-before-tracking'].includes(state.status)))throw new Error('Use Change plan after progress has been recorded.');p.workflow.plan=stages({...p,workflow:undefined}).map(publicStage);p.workflow.states=Object.fromEntries(p.workflow.plan.map(stage=>[stage.key,{status:'incomplete'}]));}
 export function currentStageStatus(p,today=p.workflow?todayInTimeZone(p.workflow.timeZone):new Date().toISOString().slice(0,10)){
   if(!p.workflow)return{tracking:false};const current=firstIncomplete(p);
   if(!current){const completed=p.workflow.activity.filter(item=>item.type==='stage_completed').at(-1);return{tracking:true,state:'complete',label:completed?.on?`Completed ${completed.on}`:'Project complete',current:null,days:0};}
