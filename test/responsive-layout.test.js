@@ -84,7 +84,9 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/class="builder-cancel" data-builder="builder-cancel"/);
   assert.match(app,/preserveProgramme:projectBuilder\.programmeLocked/);
   assert.match(app,/function programmeCanBeReplaced\(project\)/);
-  assert.match(app,/scheduleIntent\(message\)&&programmeCanBeReplaced/);
+  assert.match(app,/programmeChanged=validStagePlan\(suggestedPlan\)/);
+  assert.match(app,/programmeCanUseSchedule\(projectBuilder\.project,suggestedPlan\)/);
+  assert.match(app,/stagePlan:structuredClone\(actual\.plan\)/);
   assert.match(app,/stagePlan:validStagePlan\(a\.schedule\)\?a\.schedule:undefined/);
   assert.match(app,/const exactPlan=projectBuilder\.programmeLocked\?projectBuilder\.livePlan:validStagePlan\(d\.stagePlan\)\?d\.stagePlan:null/);
   assert.match(css,/\.builder-programme-preview\{/);

@@ -4,7 +4,7 @@ export const example=()=>({id:crypto.randomUUID(),changesPolicy:defaultChangesPo
 
 const datePattern=/^\d{4}-\d{2}-\d{2}$/;
 const parties=['studio','client','shared','third-party'];
-const eventTypes=['tracking_started','stage_completed','waiting_started','waiting_cleared','schedule_shifted','variation_started','variation_published','deliverable_status','payment_status','project_completed','project_reopened'];
+const eventTypes=['tracking_started','stage_completed','waiting_started','waiting_cleared','schedule_shifted','programme_replanned','variation_started','variation_published','deliverable_status','payment_status','project_completed','project_reopened'];
 const lifecycleStates=['draft','active','completed'];
 const deliverableStates=['planned','ready','delivered','approved'];
 const paymentStates=['planned','requested','paid'];
@@ -68,6 +68,7 @@ export function startTracking(p,{currentStageKey='kickoff',timeZone=Intl.DateTim
   p.workflow={version:2,timeZone,startedAt:new Date().toISOString(),plan,states,activity:[]};appendActivity(p.workflow,activity('tracking_started',today,{stageKey:currentStageKey}));return p.workflow;
 }
 export function refreshUnstartedPlan(p){if(!p.workflow)return;if(p.workflow.activity.some(item=>item.type!=='tracking_started')||Object.values(p.workflow.states).some(state=>!['incomplete','complete-before-tracking'].includes(state.status)))throw new Error('Use Change plan after progress has been recorded.');p.workflow.plan=stages({...p,workflow:undefined}).map(publicStage);p.workflow.states=Object.fromEntries(p.workflow.plan.map(stage=>[stage.key,{status:'incomplete'}]));}
+export function replaceWorkingPlan(p,plan,{on=todayInTimeZone(p.workflow?.timeZone||'UTC'),reason='Programme updated in project setup'}={}){if(!validStagePlan(plan))throw new Error('Choose a valid programme.');const next=structuredClone(plan).map(publicStage);if(!p.workflow){p.stagePlan=next;return next}const recordedKeys=new Set(p.workflow.activity.filter(item=>item.stageKey&&item.type!=='tracking_started').map(item=>item.stageKey));for(const [key,state] of Object.entries(p.workflow.states))if(state.status==='complete'||state.waiting)recordedKeys.add(key);if([...recordedKeys].some(key=>!next.some(stage=>stage.key===key)))throw new Error('Keep stages that already have recorded progress.');const beforeEnd=p.workflow.plan.at(-1).end;p.stagePlan=structuredClone(next);p.workflow.plan=structuredClone(next);p.workflow.states=Object.fromEntries(next.map(stage=>[stage.key,p.workflow.states[stage.key]??{status:'incomplete'}]));appendActivity(p.workflow,activity('programme_replanned',on,{reason:String(reason).trim().slice(0,1000),beforeEnd,afterEnd:next.at(-1).end}));return next;}
 export function currentStageStatus(p,today=p.workflow?todayInTimeZone(p.workflow.timeZone):new Date().toISOString().slice(0,10)){
   if(!p.workflow)return{tracking:false};const current=firstIncomplete(p);
   if(!current){const completed=p.workflow.activity.filter(item=>item.type==='stage_completed').at(-1);return{tracking:true,state:'complete',label:completed?.on?`Completed ${completed.on}`:'Project complete',current:null,days:0};}

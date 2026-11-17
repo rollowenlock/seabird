@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   addWorkingDays,clientProject,completeStage,currentStageStatus,example,
-  refreshUnstartedPlan,scheduleDatePosition,setStageWaiting,shiftRemainingStages,stages,startTracking,
+  refreshUnstartedPlan,replaceWorkingPlan,scheduleDatePosition,setStageWaiting,shiftRemainingStages,stages,startTracking,
   todayInTimeZone,validate,validStagePlan,workingDaysBetween
 } from '../dist/model.js';
 
@@ -45,6 +45,18 @@ test('tracking honours a recommended exact schedule including planned pauses',()
   assert.equal(project.workflow.plan[2].start,'2027-01-06');
   refreshUnstartedPlan(project);
   assert.deepEqual(project.workflow.plan,project.stagePlan);
+});
+
+test('a conversational replan preserves recorded stage facts and appends history',()=>{
+  const project=example();startTracking(project,{timeZone:'Pacific/Auckland',today:'2026-11-02'});completeStage(project,'kickoff','2026-11-02');
+  const next=structuredClone(project.workflow.plan);next[1].end=addWorkingDays(next[1].end,2);for(let index=2;index<next.length;index++){next[index].start=addWorkingDays(next[index].start,2);next[index].end=addWorkingDays(next[index].end,2)}
+  replaceWorkingPlan(project,next,{on:'2026-11-04',reason:'Client moved the review'});
+  assert.equal(project.workflow.states.kickoff.status,'complete');
+  assert.equal(project.workflow.states.kickoff.completedOn,'2026-11-02');
+  assert.deepEqual(project.workflow.plan,next);
+  assert.equal(project.workflow.activity.at(-1).type,'programme_replanned');
+  const missingRecorded=next.filter(stage=>stage.key!=='kickoff');
+  assert.throws(()=>replaceWorkingPlan(project,missingRecorded),/recorded progress/);
 });
 
 test('tracking rejects invalid timezones and overlapping or duplicate plans',()=>{
