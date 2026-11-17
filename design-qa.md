@@ -2,7 +2,7 @@
 
 ## Evidence
 
-- Source visual truth: `C:\Users\Home\.codex\attachments\31b71492-a623-4724-b988-9d04c9217087\Screenshot 2026-11-18 at 12.34.41.png` (1183 x 245) and `C:\Users\Home\.codex\attachments\3ea7b992-ec96-442c-9f3c-2278e237cd40\Screenshot 2026-11-18 at 12.36.41.png` (776 x 274).
+- Source visual truth: `C:\Users\Home\.codex\attachments\751512b0-ca05-494c-8c4b-e3195aa1c4a2\Screenshot 2026-11-18 at 12.49.26.png` (1155 x 223), plus the earlier overview and agreement references.
 - Browser-rendered implementation: `.artifacts/project-overview-rich-rows.png` (1185 x 825), `.artifacts/project-overview-rich-rows-mobile.png` (390 x 844), and `.artifacts/agreement-without-strip.png` (1185 x 3385).
 - Viewports: 1185 x 800 desktop and 390 x 844 mobile, device scale factor 1.
 - State: read-only project view with realistic Wellington Paranormal scope, programme, inputs, fee, payment wording, terms, and change policy; agreement opened from that project.
@@ -13,11 +13,13 @@
 - No actionable P0, P1, or P2 differences remain.
 - The formerly empty overview rows now expose one restrained line of project-specific information while preserving status and the Details affordance.
 - The agreement no longer repeats the programme as an unlabeled coloured strip. Its named, dated schedule table is now the single programme representation and is headed `Programme, reviews & timing`.
+- The Today marker and every stage now use the same calendar axis. In the verified 9 November–18 February programme, Today on 18 November is visibly before Creative direction on 23 November.
 
 ## Required fidelity surfaces
 
 - Fonts and typography: the existing DM Sans hierarchy, weights, line heights, and muted secondary text are preserved. The new preview is smaller than the section title and truncates cleanly at one line.
 - Spacing and layout rhythm: desktop rows increase from 50 px to 68 px and mobile rows to 58 px, enough for useful context without turning them into cards. Two-column alignment and Details controls remain stable.
+- Timeline geometry: real gaps between stages remain visible instead of being compressed away. Stage widths and offsets are proportional to their actual dates on desktop and mobile.
 - Colors and visual tokens: the existing off-white paper, dark ink, neutral rules, muted copy, green programme bars, and restrained controls are unchanged.
 - Image quality and asset fidelity: these screens contain no photographic, illustrative, logo, or non-standard icon assets. No placeholders or code-drawn replacement assets were introduced.
 - Copy and content: every preview comes from the live project record. Deliverables, review stages, client inputs, payment wording, terms, change policy, and private notes do not invent new commitments.
@@ -27,6 +29,7 @@
 - Overview rows: compared at approximately 1185 px wide. The original title-only rows are replaced by a title plus project-specific preview, while existing right-aligned factual status remains visible.
 - Agreement programme: compared the original coloured strip with the revised first agreement page. The redundant strip and numbered-moments explanation are removed; the full named schedule table remains immediately under the programme heading.
 - Mobile: checked at 390 x 844. Preview, status, and Details remain on one row without horizontal overflow.
+- Timeline position: the browser assertion compares the rendered bounding boxes and fails unless the 18 November marker is left of the 23 November Creative direction stage.
 
 ## Interaction and console verification
 
@@ -40,6 +43,7 @@
 1. Initial source: project sections showed titles and sparse status only; the agreement showed an unlabeled coloured timeline strip.
 2. Fixes: added one-line project-derived previews to overview rows; removed the agreement strip; renamed the schedule section to `Programme, reviews & timing`.
 3. Post-fix evidence: desktop, mobile, and agreement captures show useful context, stable alignment, and a single meaningful schedule representation.
+4. Calendar-axis fix: replaced duration-only flex sizing with absolute date positions, preserving the gaps from 9–23 November and 8 December–6 January. The revised desktop and 390 px captures place Today correctly before Creative direction.
 
 ## Implementation checklist
 
@@ -49,6 +53,7 @@
 - [x] Remove the redundant agreement timeline strip.
 - [x] Retain the complete named, dated schedule in the agreement.
 - [x] Run the complete test suite.
+- [x] Verify Today and stage positions against exact calendar dates.
 
 ## Follow-up polish
 

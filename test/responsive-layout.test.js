@@ -10,7 +10,8 @@ test('the complete timeline fits its card instead of becoming horizontally scrol
   assert.match(css,/\.timeline\{[^}]*width:100%[^}]*min-width:0/);
   assert.doesNotMatch(css,/\.timeline-scroll\{[^}]*overflow-x:auto/);
   assert.doesNotMatch(css,/\.timeline\{[^}]*min-width:670px/);
-  assert.match(app,/--stage-count:\$\{plan\.length\}/);
+  assert.match(app,/segmentStyle=\(start,finish\)=>`--stage-start:/);
+  assert.match(app,/scheduleDatePosition\(axisStart,end,value\)/);
   assert.match(app,/class="today-marker\$\{edge\}\$\{outside\}"/);
   assert.match(app,/class="timeline-lead"/);
   assert.match(app,/Today, \$\{date\(today\)\}, is \$\{days\} day/);
@@ -41,8 +42,9 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/function projectSummary\(value,max=180\)/);
   assert.match(app,/class="project-summary"/);
   assert.match(app,/pauseStageName\(v\.name\)\?' is-pause'/);
-  assert.match(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label:not\(\.timeline-lead-label\)'\)/);
-  assert.match(css,/\.timeline-labels\{display:flex;gap:clamp\(2px,\.5vw,5px\)/);
+  assert.doesNotMatch(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label:not\(\.timeline-lead-label\)'\)/);
+  assert.match(css,/\.timeline-labels\{position:relative;display:block;height:31px/);
+  assert.match(css,/\.stage,.timeline-lead\{position:absolute;left:var\(--stage-start\)/);
   assert.match(css,/\.timeline-label\.is-minor\{visibility:hidden\}/);
   assert.match(css,/\.stage\.is-pause \.bar\{background:transparent;border-top:1px dashed/);
   assert.match(css,/\.project-heading \.intro \.project-summary\{max-width:780px/);
