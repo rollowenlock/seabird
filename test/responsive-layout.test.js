@@ -44,7 +44,9 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/pauseStageName\(v\.name\)\?' is-pause'/);
   assert.doesNotMatch(app,/\.timeline-labels'\)\?\.querySelectorAll\('\.timeline-label:not\(\.timeline-lead-label\)'\)/);
   assert.match(css,/\.timeline-labels\{position:relative;display:block;height:31px/);
-  assert.match(css,/\.stage,.timeline-lead\{position:absolute;left:var\(--stage-start\)/);
+  assert.match(css,/\.timeline::before\{[^}]*left:0;right:0[^}]*height:1px[^}]*background:#cdd1c4/);
+  assert.match(css,/\.stage,.timeline-lead\{position:absolute;z-index:1;left:var\(--stage-start\)/);
+  assert.match(css,/\.stage\.is-point \.bar\{width:4px;border-radius:50%\}/);
   assert.match(css,/\.timeline-label\.is-minor\{visibility:hidden\}/);
   assert.match(css,/\.stage\.is-pause \.bar\{background:transparent;border-top:1px dashed/);
   assert.match(css,/\.project-heading \.intro \.project-summary\{max-width:780px/);

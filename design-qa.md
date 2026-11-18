@@ -14,6 +14,7 @@
 - The formerly empty overview rows now expose one restrained line of project-specific information while preserving status and the Details affordance.
 - The agreement no longer repeats the programme as an unlabeled coloured strip. Its named, dated schedule table is now the single programme representation and is headed `Programme, reviews & timing`.
 - The Today marker and every stage now use the same calendar axis. In the verified 9 November–18 February programme, Today on 18 November is visibly before Creative direction on 23 November.
+- A quiet one-pixel baseline now carries through non-working gaps, so the accurate calendar spacing reads as one continuous programme rather than disconnected bars. Point milestones render as dots instead of outlined boxes.
 
 ## Required fidelity surfaces
 
@@ -44,6 +45,7 @@
 2. Fixes: added one-line project-derived previews to overview rows; removed the agreement strip; renamed the schedule section to `Programme, reviews & timing`.
 3. Post-fix evidence: desktop, mobile, and agreement captures show useful context, stable alignment, and a single meaningful schedule representation.
 4. Calendar-axis fix: replaced duration-only flex sizing with absolute date positions, preserving the gaps from 9–23 November and 8 December–6 January. The revised desktop and 390 px captures place Today correctly before Creative direction.
+5. Continuity pass: retained those real gaps but connected them with a neutral baseline, and reduced zero-duration milestones to compact dots.
 
 ## Implementation checklist
 
@@ -54,6 +56,7 @@
 - [x] Retain the complete named, dated schedule in the agreement.
 - [x] Run the complete test suite.
 - [x] Verify Today and stage positions against exact calendar dates.
+- [x] Keep the complete calendar programme legible as one continuous line.
 
 ## Follow-up polish
 
