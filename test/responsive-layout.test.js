@@ -24,6 +24,9 @@ test('the complete timeline fits its card instead of becoming horizontally scrol
 
 test('mobile keeps the project program compact and usable without widening the page',()=>{
   assert.doesNotMatch(app,/class="mobile-stage-picker"/);
+  assert.match(app,/class="timeline-items"/);
+  assert.match(app,/Programme stages/);
+  assert.match(app,/data-stage="\$\{index\}"/);
   assert.doesNotMatch(app,/id="timeline-stage-select"/);
   assert.match(css,/@media\(max-width:600px\)\{body\{overflow-x:hidden\}/);
   assert.match(css,/\.pair\{grid-template-columns:1fr\}/);
@@ -31,6 +34,10 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(css,/\.stage\.is-point \.stage-label-compact\{display:none\}/);
   assert.match(css,/\.program-card \.stage-number\{[^}]*visibility:hidden/);
   assert.match(css,/\.program-card \.stage\.is-current \.bar\{box-shadow:0 0 0 2px/);
+  assert.match(css,/\.timeline-items\{display:block/);
+  assert.match(css,/\.project-heading h1\{display:-webkit-box;white-space:normal/);
+  assert.match(css,/\.project-card \.row-summary\{max-width:96px;overflow:visible;text-overflow:clip;white-space:normal/);
+  assert.match(app,/class="project-party-compact">For \$\{esc\(shortClientName\(p\.client\)\)\}/);
   assert.match(app,/class="onboarding-card"/);
   assert.match(css,/\.choice-grid\{grid-template-columns:1fr 1fr\}/);
   assert.match(css,/\.onboarding-numbers\{grid-template-columns:1fr\}/);

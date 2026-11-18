@@ -47,6 +47,7 @@
 4. Calendar-axis fix: replaced duration-only flex sizing with absolute date positions, preserving the gaps from 9–23 November and 8 December–6 January. The revised desktop and 390 px captures place Today correctly before Creative direction.
 5. Continuity pass: retained those real gaps but connected them with a neutral baseline, and reduced zero-duration milestones to compact dots.
 6. Phone-density pass: removed the crowded 1–9 stage indices from the compact programme and reduced the current-stage ring, leaving Today, the work bars, and the factual status line to carry the meaning.
+7. Progressive-detail pass: the mobile identity now preserves the useful client and full two-line project title, section previews can use two lines, and a `Programme stages` dropdown lists every named stage with its full date range.
 
 ## Implementation checklist
 
@@ -59,6 +60,8 @@
 - [x] Verify Today and stage positions against exact calendar dates.
 - [x] Keep the complete calendar programme legible as one continuous line.
 - [x] Remove clustered mobile stage numbers and soften the active-stage emphasis.
+- [x] Replace unhelpful mobile truncation with useful identity and two-line context.
+- [x] Add a complete, accessible mobile programme list behind a simple dropdown.
 
 ## Follow-up polish
 
