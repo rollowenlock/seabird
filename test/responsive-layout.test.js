@@ -129,12 +129,14 @@ test('the projects home is a shared portfolio timeline instead of a card grid',(
   assert.match(app,/class="portfolio-timeline"/);
   assert.match(app,/class="portfolio-project is-\$\{esc\(item\.lifecycle\)\}/);
   assert.match(app,/class="portfolio-project-menu"/);
+  assert.match(app,/<small>\$\{esc\(shortClientName\(item\.client\)\)\}<\/small>/);
   assert.match(app,/data-project-action="\$\{archived\?'restore':'archive'\}"/);
   assert.match(app,/data-project-action="delete"/);
   assert.match(app,/if\(button\.dataset\.projectAction\)/);
   assert.match(app,/Type <b>\$\{esc\(title\)\}<\/b> to confirm/);
   assert.match(app,/Every project on the same timeline\. Overlaps show where the work is busiest\./);
   assert.match(css,/\.portfolio-project\{[^}]*display:grid[^}]*width:100%/);
+  assert.match(css,/\.portfolio-project-label strong\{display:-webkit-box;overflow:hidden[^}]*-webkit-line-clamp:2/);
   assert.match(css,/\.portfolio-project-menu>div\{[^}]*right:calc\(100% \+ 6px\)/);
   assert.match(css,/\.portfolio-gridlines b\{[^}]*left:var\(--today\)/);
   assert.match(css,/@media\(max-width:600px\)[\s\S]*\.portfolio-timeline\{--project-label:112px/);

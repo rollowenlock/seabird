@@ -49,6 +49,7 @@
 6. Phone-density pass: removed the crowded 1–9 stage indices from the compact programme and reduced the current-stage ring, leaving Today, the work bars, and the factual status line to carry the meaning.
 7. Progressive-detail pass: the mobile identity now preserves the useful client and full two-line project title, section previews can use two lines, and a `Programme stages` dropdown lists every named stage with its full date range.
 8. Summary-copy pass: Deliverables now leads with the named outcome rather than technical specifications, and Payments composes the deposit, balance, and tax treatment into a short complete statement instead of clipping prose mid-sentence.
+9. Portfolio-label pass: shared-programme rows use the short client identity and allow two lines for the project name, keeping contracting notes and ellipses from displacing the useful title.
 
 ## Implementation checklist
 
