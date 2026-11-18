@@ -67,9 +67,11 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(css,/\.project-heading \.intro p\{display:none\}/);
   assert.match(app,/name="project-sections"/);
   assert.match(app,/function rowPreview\(value,fallback\)/);
+  assert.match(app,/function paymentRowPreview\(project\)/);
   assert.match(app,/class="row-copy"/);
   assert.match(app,/class="row-preview"/);
-  assert.match(app,/rowPreview\(p\.paymentNote/);
+  assert.match(app,/paymentRowPreview\(p\)/);
+  assert.doesNotMatch(app,/items\[0\]\.specs\?` · \$\{items\[0\]\.specs\}`/);
   assert.match(app,/rowPreview\(p\.changesPolicy/);
   assert.match(app,/Fee to agree/);
   assert.match(app,/deliverablesToAgree\?'To agree'/);
