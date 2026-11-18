@@ -29,6 +29,8 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(css,/\.pair\{grid-template-columns:1fr\}/);
   assert.match(app,/v\.start===v\.end\?' is-point'/);
   assert.match(css,/\.stage\.is-point \.stage-label-compact\{display:none\}/);
+  assert.match(css,/\.program-card \.stage-number\{[^}]*visibility:hidden/);
+  assert.match(css,/\.program-card \.stage\.is-current \.bar\{box-shadow:0 0 0 2px/);
   assert.match(app,/class="onboarding-card"/);
   assert.match(css,/\.choice-grid\{grid-template-columns:1fr 1fr\}/);
   assert.match(css,/\.onboarding-numbers\{grid-template-columns:1fr\}/);

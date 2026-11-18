@@ -46,6 +46,7 @@
 3. Post-fix evidence: desktop, mobile, and agreement captures show useful context, stable alignment, and a single meaningful schedule representation.
 4. Calendar-axis fix: replaced duration-only flex sizing with absolute date positions, preserving the gaps from 9–23 November and 8 December–6 January. The revised desktop and 390 px captures place Today correctly before Creative direction.
 5. Continuity pass: retained those real gaps but connected them with a neutral baseline, and reduced zero-duration milestones to compact dots.
+6. Phone-density pass: removed the crowded 1–9 stage indices from the compact programme and reduced the current-stage ring, leaving Today, the work bars, and the factual status line to carry the meaning.
 
 ## Implementation checklist
 
@@ -57,6 +58,7 @@
 - [x] Run the complete test suite.
 - [x] Verify Today and stage positions against exact calendar dates.
 - [x] Keep the complete calendar programme legible as one continuous line.
+- [x] Remove clustered mobile stage numbers and soften the active-stage emphasis.
 
 ## Follow-up polish
 
