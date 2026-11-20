@@ -27,6 +27,10 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/class="timeline-items"/);
   assert.match(app,/Programme stages/);
   assert.match(app,/data-stage="\$\{index\}"/);
+  assert.match(app,/function stageDuration\(stage\)/);
+  assert.match(app,/class="timeline-item-meta"/);
+  assert.match(app,/Milestone/);
+  assert.match(css,/\.timeline-item-meta\{display:grid;gap:1px;text-align:right\}/);
   assert.doesNotMatch(app,/id="timeline-stage-select"/);
   assert.match(css,/@media\(max-width:600px\)\{body\{overflow-x:hidden\}/);
   assert.match(css,/\.pair\{grid-template-columns:1fr\}/);
@@ -90,6 +94,7 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(app,/Set up the project by talking\./);
   assert.match(app,/class="builder-chat"/);
   assert.match(app,/data-builder="chat-send"/);
+  assert.match(app,/d\.programme\?\.reviewDays/);
   assert.match(app,/Review and edit project details/);
   assert.match(app,/ChatGPT · private/);
   assert.match(app,/Describe the work naturally/);
