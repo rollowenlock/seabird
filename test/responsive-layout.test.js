@@ -39,7 +39,7 @@ test('mobile keeps the project program compact and usable without widening the p
   assert.match(css,/\.program-card \.stage-number\{[^}]*visibility:hidden/);
   assert.match(css,/\.program-card \.stage\.is-current \.bar\{box-shadow:0 0 0 2px/);
   assert.match(css,/\.timeline-items\{display:block/);
-  assert.match(css,/\.project-heading h1\{display:-webkit-box;white-space:normal/);
+  assert.match(css,/\.project-heading h1\{display:block;white-space:normal;overflow:visible;[^}]*line-height:1\.08;padding-bottom:2px/);
   assert.match(css,/\.project-card \.row-summary\{max-width:96px;overflow:visible;text-overflow:clip;white-space:normal/);
   assert.match(app,/class="project-party-compact">For \$\{esc\(shortClientName\(p\.client\)\)\}/);
   assert.match(app,/class="onboarding-card"/);
